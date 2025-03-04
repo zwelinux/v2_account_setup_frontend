@@ -1,0 +1,7 @@
+.app-container {
+  padding: 2rem;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  background: #e9ecef;
+  min-height: 100vh;
+}
