@@ -1,0 +1,25 @@
+.product-detail-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+    text-align: center;
+  }
+  
+  .product-detail-container img {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+  
+  .product-detail-container p {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+  }
+  
+  .error-message {
+    color: red;
+    text-align: center;
+  }
+  

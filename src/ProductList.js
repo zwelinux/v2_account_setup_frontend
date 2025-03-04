@@ -1,4 +1,6 @@
+// src/ProductList.js
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import './ProductList.css';
 
 function ProductList() {
@@ -10,7 +12,7 @@ function ProductList() {
       const response = await fetch('http://localhost:8000/api/auth/products/', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // Send cookies for session-based auth if needed
+        credentials: 'include'
       });
       if (response.ok) {
         const data = await response.json();
@@ -27,20 +29,30 @@ function ProductList() {
     fetchProducts();
   }, []);
 
+  // Construct a full URL for the image
+  const getImageUrl = (product) => {
+    // If your serializer returns an absolute URL in `image_url`, use that
+    if (product.image_url) return product.image_url;
+    // Otherwise, assume the image field is a relative path under /media/
+    return `http://localhost:8000/media/${product.image}`;
+  };
+
   return (
     <div className="product-list-container">
-      <h2>Your Uploaded Products</h2>
+      <h2>All Products</h2>
       {error && <p className="error-message">{error}</p>}
       <div className="product-cards">
         {products.length > 0 ? (
           products.map((product) => (
-            <div className="product-card" key={product.id}>
-              {/* Assuming image field returns a relative path */}
-              <img src={`http://localhost:8000${product.image}`} alt={product.title} />
-              <h3>{product.title}</h3>
-              <p>{product.description}</p>
-              <p>Price: ${product.second_hand_price}</p>
-            </div>
+            // Wrap each card in a Link so that clicking it navigates to the product detail page
+            <Link key={product.id} to={`/products/${product.id}`} className="product-link">
+              <div className="product-card">
+                <img src={getImageUrl(product)} alt={product.title} />
+                <h3>{product.title}</h3>
+                <p>{product.description}</p>
+                <p>Price: ${product.second_hand_price}</p>
+              </div>
+            </Link>
           ))
         ) : (
           <p>No products found.</p>

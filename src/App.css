@@ -5,3 +5,41 @@
   background: #e9ecef;
   min-height: 100vh;
 }
+
+/* src/App.css */
+.app-container {
+  padding: 1rem;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+nav ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  gap: 1rem;
+}
+
+nav li {
+  display: inline;
+}
+
+nav a {
+  text-decoration: none;
+  color: #007bff;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+main {
+  max-width: 800px;
+  margin: 0 auto;
+}
