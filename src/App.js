@@ -1,6 +1,6 @@
-// src/App.js
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import Header from './Header';
 import Register from './Register';
 import Login from './Login';
 import Dashboard from './Dashboard';
@@ -59,22 +59,11 @@ function App() {
   return (
     <Router>
       <div className="app-container">
-        <header>
-          <h1>Buy & Sell Platform</h1>
-          {isAuthenticated && (
-            <nav>
-              <ul>
-                <li><Link to="/dashboard">Dashboard</Link></li>
-                <li><Link to="/profile">My Profile ({user.username})</Link></li>
-                <li><Link to="/upload">Upload Product</Link></li>
-                <li>
-                  <button onClick={handleLogoutSuccess}>Logout</button>
-                </li>
-              </ul>
-            </nav>
-          )}
-        </header>
-
+        <Header
+          isAuthenticated={isAuthenticated}
+          user={user}
+          handleLogoutSuccess={handleLogoutSuccess}
+        />
         <main>
           {isAuthenticated ? (
             <Routes>
