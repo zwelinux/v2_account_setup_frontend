@@ -1,13 +1,16 @@
+// src/App.js
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
-import Header from './Header';
 import Register from './Register';
 import Login from './Login';
 import Dashboard from './Dashboard';
-import Profile from './Profile';
+import Profile from './Profile'; // For internal profile editing (My Products)
 import UploadProduct from './UploadProduct';
-import ProductDetail from './ProductDetail';
+import UserProfile from './UserProfile';
 import './App.css';
+
+// Import icons from react-icons
+import { FaShareAlt, FaSignOutAlt } from 'react-icons/fa';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -59,18 +62,40 @@ function App() {
   return (
     <Router>
       <div className="app-container">
-        <Header
-          isAuthenticated={isAuthenticated}
-          user={user}
-          handleLogoutSuccess={handleLogoutSuccess}
-        />
+        <header>
+          <h1>Buy & Sell Platform</h1>
+          {isAuthenticated && (
+            <nav>
+              <ul>
+                <li><Link to="/dashboard">Dashboard</Link></li>
+                <li><Link to="/profile">My Products</Link></li>
+                <li><Link to="/upload">Upload Product</Link></li>
+                <li>
+                  {/* Share icon linking to the public profile page */}
+                  <Link to={`/profile/${user.username}`}>
+                    <FaShareAlt title="Share Profile" size={20} />
+                  </Link>
+                </li>
+                <li>
+                  {/* Logout icon as a button */}
+                  <button onClick={handleLogoutSuccess} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                    <FaSignOutAlt title="Logout" size={20} />
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          )}
+        </header>
+
         <main>
           {isAuthenticated ? (
             <Routes>
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/profile" element={<Profile />} />
               <Route path="/upload" element={<UploadProduct />} />
-              <Route path="/products/:id" element={<ProductDetail />} />
+              {/* Internal profile for editing */}
+              <Route path="/profile" element={<Profile />} />
+              {/* Public profile page for sharing */}
+              <Route path="/profile/:username" element={<UserProfile />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
           ) : (
