@@ -5,7 +5,6 @@ import ProductList from './ProductList';
 function Dashboard() {
   return (
     <div>
-      <h2>Dashboard</h2>
       <ProductList />
     </div>
   );

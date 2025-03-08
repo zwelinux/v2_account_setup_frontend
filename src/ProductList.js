@@ -9,7 +9,7 @@ function ProductList() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('https://ladyfirst.pythonanywhere.com/api/auth/products/', {
+      const response = await fetch('http://localhost:8000/api/auth/products/', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include'
@@ -34,7 +34,7 @@ function ProductList() {
     // If your serializer returns an absolute URL in `image_url`, use that
     if (product.image_url) return product.image_url;
     // Otherwise, assume the image field is a relative path under /media/
-    return `https://ladyfirst.pythonanywhere.com/media/${product.image}`;
+    return `http://localhost:8000/media/${product.image}`;
   };
 
   return (

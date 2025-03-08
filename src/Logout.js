@@ -4,7 +4,7 @@ import React from 'react';
 function Logout({ onLogout }) {
   const handleLogout = async () => {
     try {
-      const response = await fetch('https://ladyfirst.pythonanywhere.com/api/auth/logout/', {
+      const response = await fetch('http://localhost:8000/api/auth/logout/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include'

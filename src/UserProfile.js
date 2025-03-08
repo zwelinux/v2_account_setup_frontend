@@ -97,7 +97,7 @@ function UserProfile() {
               <Link to={`/products/${product.id}`} className="product-link">
                 <img
                   className="product-image"
-                  src={product.image_url ? product.image_url : `https://ladyfirst.pythonanywhere.com/media/${product.image}`}
+                  src={product.image_url ? product.image_url : `http://localhost:8000/media/${product.image}`}
                   alt={product.title}
                 />
                 <h4>{product.title}</h4>

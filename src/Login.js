@@ -9,7 +9,7 @@ function Login({ onLogin, toggleToRegister }) {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('https://ladyfirst.pythonanywhere.com/api/auth/login/', {
+      const response = await fetch('http://localhost:8000/api/auth/login/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',  // Sends cookies for session authentication

@@ -34,7 +34,7 @@ function MyProductsList({ refresh }) {
   // Fetch the user's products
   const fetchMyProducts = async () => {
     try {
-      const response = await fetch('https://ladyfirst.pythonanywhere.com/api/auth/myproducts/', {
+      const response = await fetch('http://localhost:8000/api/auth/myproducts/', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include'
@@ -60,7 +60,7 @@ function MyProductsList({ refresh }) {
     try {
       const csrftoken = getCookie('csrftoken');
 
-      const response = await fetch(`https://ladyfirst.pythonanywhere.com/api/auth/products/${id}/`, {
+      const response = await fetch(`http://localhost:8000/api/auth/products/${id}/`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ function MyProductsList({ refresh }) {
   
       console.log('Sending update request:', updatedData);
   
-      const response = await fetch(`https://ladyfirst.pythonanywhere.com/api/auth/products/${editProduct.id}/`, {
+      const response = await fetch(`http://localhost:8000/api/auth/products/${editProduct.id}/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ function MyProductsList({ refresh }) {
                   src={
                     product.image.startsWith('http')
                       ? product.image
-                      : `https://ladyfirst.pythonanywhere.com/media/${product.image}`
+                      : `http://localhost:8000/media/${product.image}`
                   }
                   alt={product.title}
                 />

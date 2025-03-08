@@ -11,7 +11,7 @@ function ProductDetail() {
   useEffect(() => {
     async function fetchProduct() {
       try {
-        const response = await fetch(`https://ladyfirst.pythonanywhere.com/api/auth/products/${id}/`, {
+        const response = await fetch(`http://localhost:8000/api/auth/products/${id}/`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include'
@@ -36,7 +36,7 @@ function ProductDetail() {
     <div className="product-detail-container">
       <h2>{product.title}</h2>
       {/* Use image_url if available or build the URL using product.image */}
-      <img src={product.image_url ? product.image_url : `https://ladyfirst.pythonanywhere.com/media/${product.image}`} alt={product.title} />
+      <img src={product.image_url ? product.image_url : `http://localhost:8000/media/${product.image}`} alt={product.title} />
       <p>{product.description}</p>
       <p>Price: ${product.second_hand_price}</p>
       <p>Condition: {product.condition}</p>
