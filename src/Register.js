@@ -101,7 +101,7 @@ function Register({ onRegisterSuccess, toggleToLogin }) {
       data.append('profile_picture', profilePicture);
     }
     try {
-      const response = await fetch('http://localhost:8000/api/auth/register/', {
+      const response = await fetch('https://ladyfirst.pythonanywhere.com/api/auth/register/', {
         method: 'POST',
         body: data
       });

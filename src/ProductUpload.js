@@ -23,14 +23,14 @@ function ProductUpload({ onUploadSuccess }) {
   useEffect(() => {
     async function fetchData() {
       try {
-        const catRes = await fetch('http://localhost:8000/api/auth/categories/');
+        const catRes = await fetch('https://ladyfirst.pythonanywhere.com/api/auth/categories/');
         const catData = await catRes.json();
         setCategories(catData);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
       try {
-        const brandRes = await fetch('http://localhost:8000/api/auth/brands/');
+        const brandRes = await fetch('https://ladyfirst.pythonanywhere.com/api/auth/brands/');
         const brandData = await brandRes.json();
         setBrands(brandData);
       } catch (error) {
@@ -70,7 +70,7 @@ function ProductUpload({ onUploadSuccess }) {
     if (authDoc) data.append('authenticity_document', authDoc);
 
     try {
-      const response = await fetch('http://localhost:8000/api/auth/products/', {
+      const response = await fetch('https://ladyfirst.pythonanywhere.com/api/auth/products/', {
         method: 'POST',
         body: data,
         credentials: 'include',
