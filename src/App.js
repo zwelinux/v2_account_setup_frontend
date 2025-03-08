@@ -16,6 +16,7 @@ function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const checkUser = async () => {
     try {
@@ -35,6 +36,8 @@ function AppContent() {
     } catch (error) {
       setUser(null);
       setIsAuthenticated(false);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -66,33 +69,45 @@ function AppContent() {
   };
 
   const toggleToLogin = () => setShowRegister(false);
-  const toggleToRegister = () => setShowRegister(true);
+  const toggleToRegister = () => setShowRegister(true); // 💡 Added back
+
+
+  if (loading) {
+    return <p>Loading...</p>; // Prevents flickering issues
+  }
 
   return (
     <div className="app-container">
       <Header isAuthenticated={isAuthenticated} user={user} handleLogout={handleLogout} />
       <main>
-        {isAuthenticated ? (
-          <Routes>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/upload" element={<UploadProduct />} />
-            {/* Internal profile editing page */}
-            <Route path="/profile" element={<Profile />} />
-            {/* Public profile page for sharing */}
-            <Route path="/profile/:username" element={<UserProfile />} />
-            {/* Product detail page */}
-            <Route path="/products/:id" element={<ProductDetail />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        ) : (
-          <>
-            {showRegister ? (
-              <Register onRegisterSuccess={toggleToLogin} toggleToLogin={toggleToLogin} />
-            ) : (
-              <Login onLogin={handleLoginSuccess} toggleToRegister={toggleToRegister} />
-            )}
-          </>
-        )}
+        <Routes>
+          {/* Publicly accessible profile page */}
+          <Route path="/profile/:username" element={<UserProfile />} />
+          <Route path="/products/:id" element={<ProductDetail />} />
+
+          {/* Private routes */}
+          {isAuthenticated ? (
+            <>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/upload" element={<UploadProduct />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </>
+          ) : (
+            <>
+              {/* Login & Register for unauthenticated users */}
+              <Route
+                path="/"
+                element={showRegister ? (
+                  <Register onRegisterSuccess={toggleToLogin} toggleToLogin={toggleToLogin} />
+                ) : (
+                  <Login onLogin={handleLoginSuccess} toggleToRegister={toggleToRegister} />
+                )}
+              />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </>
+          )}
+        </Routes>
       </main>
     </div>
   );

@@ -1,91 +1,112 @@
 // src/UserProfile.js
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import './UserProfile.css';
 
 function UserProfile() {
   const { username } = useParams();
   const [profile, setProfile] = useState(null);
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   // Fetch public profile data
   useEffect(() => {
-    async function fetchProfile() {
+    const fetchProfile = async () => {
       try {
         const response = await fetch(`http://localhost:8000/api/auth/profile/${username}/`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
+          // Removed credentials: 'include' to allow public access
         });
+
         if (response.ok) {
           const data = await response.json();
           setProfile(data);
         } else {
-          setError('Failed to load profile.');
+          setError('Profile not found.');
         }
       } catch (err) {
-        setError('Error: ' + err.message);
+        setError('Error fetching profile.');
+      } finally {
+        setLoading(false);
       }
-    }
+    };
+
     fetchProfile();
   }, [username]);
 
   // Fetch products created by this user
   useEffect(() => {
-    async function fetchProducts() {
+    const fetchProducts = async () => {
       try {
         const response = await fetch(`http://localhost:8000/api/auth/profile/${username}/products/`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
+          // Removed credentials: 'include' to allow public access
         });
+
         if (response.ok) {
           const data = await response.json();
           setProducts(data);
-        } else {
-          console.error('Failed to load products for user.');
         }
       } catch (err) {
-        console.error('Error fetching user products: ' + err.message);
+        console.error('Error fetching user products:', err);
       }
-    }
+    };
+
     fetchProducts();
   }, [username]);
 
+  // Show loading state
+  if (loading) return <p className="loading-message">Loading profile...</p>;
+
+  // Show error message if profile not found
   if (error) return <p className="error-message">{error}</p>;
-  if (!profile) return <p>Loading profile...</p>;
 
   return (
     <div className="user-profile">
       <h2>{profile.username}'s Profile</h2>
-      {profile.profile_picture ? (
-        <img
-          src={profile.profile_picture.startsWith('http') 
-              ? profile.profile_picture 
-              : `http://localhost:8000/media/${profile.profile_picture}`}
-          alt={profile.username}
-        />
-      ) : (
-        <img src="http://localhost:8000/media/default_profile.jpg" alt="default" />
-      )}
-      <p>Email: {profile.email}</p>
-      <p>Phone: {profile.phone_number}</p>
-      <p>Address: {profile.city}, {profile.province}, {profile.country}</p>
 
+      <div className="profile-info">
+        {/* Profile Image */}
+        <img
+          className="profile-picture"
+          src={profile.profile_picture 
+            ? (profile.profile_picture.startsWith('http') 
+              ? profile.profile_picture 
+              : `http://localhost:8000/media/${profile.profile_picture}`)
+            : 'http://localhost:8000/media/default_profile.jpg'}
+          alt={`${profile.username}'s profile`}
+        />
+
+        {/* User Information */}
+        <div className="profile-details">
+          <p><strong>Email:</strong> {profile.email || 'Not provided'}</p>
+          <p><strong>Phone:</strong> {profile.phone_number || 'Not provided'}</p>
+          <p><strong>Location:</strong> {profile.city}, {profile.province}, {profile.country}</p>
+        </div>
+      </div>
+
+      {/* User Products */}
       <h3>Products Uploaded by {profile.username}</h3>
       <div className="product-cards">
         {products.length > 0 ? (
           products.map((product) => (
             <div className="product-card" key={product.id}>
-              <img
-                src={product.image_url ? product.image_url : `http://localhost:8000/media/${product.image}`}
-                alt={product.title}
-              />
-              <h4>{product.title}</h4>
-              <p>Price: ${product.second_hand_price}</p>
+              <Link to={`/products/${product.id}`} className="product-link">
+                <img
+                  className="product-image"
+                  src={product.image_url ? product.image_url : `http://localhost:8000/media/${product.image}`}
+                  alt={product.title}
+                />
+                <h4>{product.title}</h4>
+                <p>Price: ${product.second_hand_price}</p>
+              </Link>
             </div>
           ))
         ) : (
-          <p>No products found.</p>
+          <p className="no-products-message">No products found.</p>
         )}
       </div>
     </div>
