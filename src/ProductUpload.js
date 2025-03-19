@@ -56,35 +56,47 @@ function ProductUpload({ onUploadSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
+  
     const data = new FormData();
-    data.append('title', title);
-    data.append('description', description);
-    data.append('original_price', originalPrice);
-    data.append('second_hand_price', secondHandPrice);
-    data.append('category', category);  // PK value
-    if (brand) data.append('brand', brand); // PK value
-    data.append('condition', condition);
-    data.append('size', size);
-    data.append('color', color);
-    if (image) data.append('image', image);
-    if (authDoc) data.append('authenticity_document', authDoc);
-
+    data.append("title", title);
+    data.append("description", description);
+    data.append("original_price", originalPrice);
+    data.append("second_hand_price", secondHandPrice);
+    data.append("category", category); // PK value
+    if (brand) data.append("brand", brand); // PK value
+    data.append("condition", condition);
+    data.append("size", size);
+    data.append("color", color);
+    if (image) data.append("image", image);
+    if (authDoc) data.append("authenticity_document", authDoc);
+  
+    // ✅ Get access token from localStorage
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      setMessage("Error: No authentication token found.");
+      return;
+    }
+  
     try {
-      const response = await fetch('http://localhost:8000/api/auth/products/', {
-        method: 'POST',
+      const response = await fetch("http://localhost:8000/api/auth/products/", {
+        method: "POST",
         body: data,
-        credentials: 'include',
+        headers: {
+          "Authorization": `Bearer ${token}`,  // ✅ Include access token
+        },
       });
+  
       const json = await response.json();
       if (response.ok) {
-        setMessage('Product uploaded successfully!');
+        setMessage("Product uploaded successfully!");
         resetForm();
         onUploadSuccess && onUploadSuccess();
       } else {
-        setMessage('Error: ' + JSON.stringify(json));
+        setMessage("Error: " + JSON.stringify(json));
       }
     } catch (error) {
-      setMessage('Error: ' + error.message);
+      setMessage("Error: " + error.message);
     }
   };
 

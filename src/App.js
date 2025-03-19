@@ -1,13 +1,13 @@
 // src/App.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Register from './Register';
 import Login from './Login';
 import Dashboard from './Dashboard';
-import Profile from './Profile'; // For internal profile editing (My Products)
+import Profile from './Profile';
 import UploadProduct from './UploadProduct';
-import UserProfile from './UserProfile';  // Public profile page for sharing
-import ProductDetail from './ProductDetail'; // Product detail page
+import UserProfile from './UserProfile';
+import ProductDetail from './ProductDetail';
 import Header from './Header';
 import './App.css';
 
@@ -18,62 +18,109 @@ function AppContent() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const checkUser = async () => {
+  const checkUser = useCallback(async () => {
+    setLoading(true);
+
+    const token = localStorage.getItem('access_token');
+
+    if (!token) {
+      setUser(null);
+      setIsAuthenticated(false);
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch('http://localhost:8000/api/auth/user/', {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
       });
+
       if (response.ok) {
         const data = await response.json();
         setUser(data);
         setIsAuthenticated(true);
+      } else if (response.status === 401) {
+        await refreshToken();
       } else {
         setUser(null);
         setIsAuthenticated(false);
       }
     } catch (error) {
+      console.error('Error fetching user:', error);
       setUser(null);
       setIsAuthenticated(false);
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // ✅ Removed unnecessary dependencies to avoid infinite loops
 
-  useEffect(() => {
-    checkUser();
-  }, []);
+  const refreshToken = useCallback(async () => {
+    const refresh_token = localStorage.getItem('refresh_token');
 
-  const handleLoginSuccess = () => {
-    checkUser();
-  };
+    if (!refresh_token) {
+      setIsAuthenticated(false);
+      return;
+    }
 
-  const handleLogout = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/auth/token/refresh/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh: refresh_token }),
+      });
+
+      if (response.ok) {
+        const json = await response.json();
+        localStorage.setItem('access_token', json.access);
+        await checkUser(); // ✅ Fetch user again with the new token
+      } else {
+        handleLogout(); // ✅ Logout if refresh fails
+      }
+    } catch (error) {
+      console.error('Error refreshing token:', error);
+      handleLogout();
+    }
+  }, [checkUser]); // ✅ Only depends on checkUser now
+
+  const handleLogout = useCallback(async () => {
     try {
       const response = await fetch('http://localhost:8000/api/auth/logout/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
+        credentials: 'include',
       });
+
       if (response.ok) {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
         setUser(null);
         setIsAuthenticated(false);
-        navigate('/'); // Redirect to login page after logout
+        navigate('/');
       } else {
         console.error('Logout failed.');
       }
     } catch (error) {
       console.error('Logout error:', error);
     }
+  }, [navigate]);
+
+  useEffect(() => {
+    checkUser();
+  }, [checkUser]);
+
+  const handleLoginSuccess = () => {
+    checkUser();
   };
 
   const toggleToLogin = () => setShowRegister(false);
-  const toggleToRegister = () => setShowRegister(true); // 💡 Added back
-
+  const toggleToRegister = () => setShowRegister(true);
 
   if (loading) {
-    return <p>Loading...</p>; // Prevents flickering issues
+    return <p>Loading...</p>;
   }
 
   return (
@@ -81,11 +128,9 @@ function AppContent() {
       <Header isAuthenticated={isAuthenticated} user={user} handleLogout={handleLogout} />
       <main>
         <Routes>
-          {/* Publicly accessible profile page */}
           <Route path="/profile/:username" element={<UserProfile />} />
           <Route path="/products/:id" element={<ProductDetail />} />
 
-          {/* Private routes */}
           {isAuthenticated ? (
             <>
               <Route path="/dashboard" element={<Dashboard />} />
@@ -95,7 +140,6 @@ function AppContent() {
             </>
           ) : (
             <>
-              {/* Login & Register for unauthenticated users */}
               <Route
                 path="/"
                 element={showRegister ? (

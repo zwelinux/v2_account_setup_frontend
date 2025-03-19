@@ -1,4 +1,3 @@
-// src/Logout.js
 import React from 'react';
 
 function Logout({ onLogout }) {
@@ -6,10 +5,17 @@ function Logout({ onLogout }) {
     try {
       const response = await fetch('http://localhost:8000/api/auth/logout/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        },
+        credentials: 'include',
       });
+
       if (response.ok) {
+        // ✅ Remove tokens on successful logout
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
         onLogout && onLogout();
       } else {
         console.error("Logout failed");

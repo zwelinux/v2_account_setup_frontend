@@ -1,53 +1,47 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { FaEdit, FaTrash } from 'react-icons/fa'; // Import icons
-import './MyProductsList.css';
-
-/**
- * Helper function to get the CSRF token from browser cookies.
- */
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      if (cookie.startsWith(name + '=')) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-}
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { FaEdit, FaTrash } from "react-icons/fa"; // Import icons
+import "./MyProductsList.css";
 
 function MyProductsList({ refresh }) {
   const [products, setProducts] = useState([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [editProduct, setEditProduct] = useState(null);
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    second_hand_price: ''
+    title: "",
+    description: "",
+    second_hand_price: "",
   });
 
-  // Fetch the user's products
+  // ✅ Get JWT access token from localStorage
+  const getAccessToken = () => localStorage.getItem("access_token");
+
+  // ✅ Fetch the user's products with Authorization header
   const fetchMyProducts = async () => {
+    const token = getAccessToken();
+    if (!token) {
+      setError("Error: Authentication token not found.");
+      return;
+    }
+
     try {
-      const response = await fetch('http://localhost:8000/api/auth/myproducts/', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
+      const response = await fetch("http://localhost:8000/api/auth/myproducts/", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ Include JWT token
+          "Content-Type": "application/json",
+        },
       });
+
       if (response.ok) {
         const data = await response.json();
         data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         setProducts(data);
       } else {
-        setError('Failed to load products.');
+        setError("Failed to load products. Ensure you are logged in.");
       }
     } catch (err) {
-      setError('Error: ' + err.message);
+      setError("Error: " + err.message);
     }
   };
 
@@ -55,91 +49,94 @@ function MyProductsList({ refresh }) {
     fetchMyProducts();
   }, [refresh]);
 
-  // Delete a product
+  // ✅ Delete a product (Authenticated User Only)
   const handleDelete = async (id) => {
-    try {
-      const csrftoken = getCookie('csrftoken');
+    const token = getAccessToken();
+    if (!token) {
+      setError("Error: Authentication token not found.");
+      return;
+    }
 
+    try {
       const response = await fetch(`http://localhost:8000/api/auth/products/${id}/`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrftoken
+          Authorization: `Bearer ${token}`, // ✅ Include JWT token
+          "Content-Type": "application/json",
         },
-        credentials: 'include'
       });
 
       if (response.ok) {
         setProducts((prev) => prev.filter((product) => product.id !== id));
       } else if (response.status === 403) {
-        setError('Forbidden: You are not allowed to delete this product.');
+        setError("Forbidden: You are not allowed to delete this product.");
       } else {
         setError(`Delete failed with status ${response.status}.`);
       }
     } catch (error) {
-      console.error('Error deleting product:', error);
-      setError('Error deleting product: ' + error.message);
+      console.error("Error deleting product:", error);
+      setError("Error deleting product: " + error.message);
     }
   };
 
-  // Open the edit form with existing product details
+  // ✅ Open the Edit Modal
   const openEditForm = (product) => {
     setEditProduct(product);
     setFormData({
       title: product.title,
       description: product.description,
-      second_hand_price: product.second_hand_price
+      second_hand_price: product.second_hand_price,
     });
   };
 
-  // Handle input changes in the edit form
+  // ✅ Handle input changes in the edit form
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Update product details (PUT request)
+  // ✅ Update product details (PUT request)
   const handleEdit = async () => {
     if (!editProduct) return;
-  
+
+    const token = getAccessToken();
+    if (!token) {
+      setError("Error: Authentication token not found.");
+      return;
+    }
+
     try {
-      const csrftoken = getCookie('csrftoken');
-  
       const updatedData = {
         title: formData.title.trim(),
         description: formData.description.trim(),
         second_hand_price: parseFloat(formData.second_hand_price) || 0,
       };
-  
-      console.log('Sending update request:', updatedData);
-  
+
       const response = await fetch(`http://localhost:8000/api/auth/products/${editProduct.id}/`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrftoken
+          Authorization: `Bearer ${token}`, // ✅ Include JWT token
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
-        body: JSON.stringify(updatedData)
+        body: JSON.stringify(updatedData),
       });
-  
+
       if (response.ok) {
         setProducts((prev) =>
           prev.map((product) =>
             product.id === editProduct.id ? { ...product, ...updatedData } : product
           )
         );
-        setEditProduct(null);
+        setEditProduct(null); // ✅ Close the modal
       } else {
         const errorData = await response.json();
-        console.error('Update failed:', errorData);
+        console.error("Update failed:", errorData);
         setError(`Update failed: ${JSON.stringify(errorData)}`);
       }
     } catch (error) {
-      console.error('Error updating product:', error);
-      setError('Error updating product: ' + error.message);
+      console.error("Error updating product:", error);
+      setError("Error updating product: " + error.message);
     }
   };
-  
 
   return (
     <div className="my-products-container">
@@ -153,7 +150,7 @@ function MyProductsList({ refresh }) {
               <Link to={`/products/${product.id}`} className="product-link">
                 <img
                   src={
-                    product.image.startsWith('http')
+                    product.image.startsWith("http")
                       ? product.image
                       : `http://localhost:8000/media/${product.image}`
                   }
@@ -177,7 +174,7 @@ function MyProductsList({ refresh }) {
         )}
       </div>
 
-      {/* Edit Product Modal */}
+      {/* ✅ Edit Product Modal */}
       {editProduct && (
         <div className="modal">
           <div className="modal-content">

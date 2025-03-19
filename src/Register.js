@@ -84,15 +84,16 @@ function Register({ onRegisterSuccess, toggleToLogin }) {
     if (step > 1) setStep(step - 1);
   };
   
-  // Final submission on step 3
+
   const handleRegister = async (e) => {
     e.preventDefault();
-    // Final check for address fields
+  
     if (!formData.country || !formData.province || !formData.city) {
       setMessage("Please fill in your address.");
       return;
     }
-    // Prepare form data for multipart/form-data upload
+  
+    // ✅ Prepare form data
     const data = new FormData();
     for (let key in formData) {
       data.append(key, formData[key]);
@@ -100,23 +101,56 @@ function Register({ onRegisterSuccess, toggleToLogin }) {
     if (profilePicture) {
       data.append('profile_picture', profilePicture);
     }
+  
     try {
       const response = await fetch('http://localhost:8000/api/auth/register/', {
         method: 'POST',
-        body: data
+        headers: { 'Accept': 'application/json' },  // ✅ No authentication required
+        body: data,
       });
+  
       const json = await response.json();
+  
       if (response.ok) {
+        // ✅ Store tokens in localStorage
+        localStorage.setItem('access_token', json.access);
+        localStorage.setItem('refresh_token', json.refresh);
+  
         setMessage("Account created successfully!");
-        // After a short delay, switch to login view
+  
+        // ✅ Fetch user details immediately after registration
+        fetchUserData(json.access);
+  
         setTimeout(() => {
           onRegisterSuccess && onRegisterSuccess();
         }, 2000);
       } else {
-        setMessage(json.error || JSON.stringify(json));
+        setMessage(json.detail || JSON.stringify(json));
       }
     } catch (error) {
       setMessage("Error: " + error.message);
+    }
+  };
+  
+  // ✅ Fetch user details with the access token
+  const fetchUserData = async (token) => {
+    try {
+      const response = await fetch('http://localhost:8000/api/auth/user/', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,  // ✅ Send token in Authorization header
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response.ok) {
+        const userData = await response.json();
+        console.log("User data:", userData);
+      } else {
+        console.error("Failed to fetch user details");
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error.message);
     }
   };
   
