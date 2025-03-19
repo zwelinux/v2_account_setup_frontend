@@ -120,7 +120,7 @@ function AppContent() {
   const toggleToRegister = () => setShowRegister(true);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <p>Loading please wait...</p>;
   }
 
   return (
