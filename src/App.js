@@ -18,46 +18,30 @@ function AppContent() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const checkUser = useCallback(async () => {
-    setLoading(true);
-
-    const token = localStorage.getItem('access_token');
-
-    if (!token) {
-      setUser(null);
-      setIsAuthenticated(false);
-      setLoading(false);
-      return;
-    }
-
+  // ✅ Logout Function
+  const handleLogout = useCallback(async () => {
     try {
-      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/user/', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
+      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/logout/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
       });
 
       if (response.ok) {
-        const data = await response.json();
-        setUser(data);
-        setIsAuthenticated(true);
-      } else if (response.status === 401) {
-        await refreshToken();
-      } else {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
         setUser(null);
         setIsAuthenticated(false);
+        navigate('/');
+      } else {
+        console.error('Logout failed.');
       }
     } catch (error) {
-      console.error('Error fetching user:', error);
-      setUser(null);
-      setIsAuthenticated(false);
-    } finally {
-      setLoading(false);
+      console.error('Logout error:', error);
     }
-  }, []); // ✅ Removed unnecessary dependencies to avoid infinite loops
+  }, [navigate]);
 
+  // ✅ Refresh Access Token
   const refreshToken = useCallback(async () => {
     const refresh_token = localStorage.getItem('refresh_token');
 
@@ -84,34 +68,54 @@ function AppContent() {
       console.error('Error refreshing token:', error);
       handleLogout();
     }
-  }, [checkUser]); // ✅ Only depends on checkUser now
+  }, [handleLogout]); // ✅ Dependency added
 
-  const handleLogout = useCallback(async () => {
+  // ✅ Fetch Authenticated User
+  const checkUser = useCallback(async () => {
+    setLoading(true);
+    const token = localStorage.getItem('access_token');
+
+    if (!token) {
+      setUser(null);
+      setIsAuthenticated(false);
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/logout/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/user/', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (response.ok) {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
+        const data = await response.json();
+        setUser(data);
+        setIsAuthenticated(true);
+      } else if (response.status === 401) {
+        await refreshToken();
+      } else {
         setUser(null);
         setIsAuthenticated(false);
-        navigate('/');
-      } else {
-        console.error('Logout failed.');
       }
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('Error fetching user:', error);
+      setUser(null);
+      setIsAuthenticated(false);
+    } finally {
+      setLoading(false);
     }
-  }, [navigate]);
+  }, [refreshToken]); // ✅ Dependency added
 
+  // ✅ Check user session on mount
   useEffect(() => {
     checkUser();
   }, [checkUser]);
 
+  // ✅ Handle successful login
   const handleLoginSuccess = () => {
     checkUser();
   };
