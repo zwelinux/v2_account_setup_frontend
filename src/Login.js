@@ -11,7 +11,7 @@ function Login({ onLogin, toggleToRegister }) {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:8000/api/auth/token/', {
+      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/token/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }), // ✅ Use "email" instead of "username"
@@ -41,7 +41,7 @@ function Login({ onLogin, toggleToRegister }) {
   // ✅ Fetch user details using the access token
   const fetchUserData = async (token) => {
     try {
-      const response = await fetch('http://localhost:8000/api/auth/user/', {
+      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/user/', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,  // ✅ Send token in Authorization header
