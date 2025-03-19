@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './Login.css';
 
 function Login({ onLogin, toggleToRegister }) {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
 
@@ -14,7 +14,7 @@ function Login({ onLogin, toggleToRegister }) {
       const response = await fetch('http://localhost:8000/api/auth/token/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }), // ✅ Use "email" instead of "username"
       });
 
       const json = await response.json();
@@ -65,10 +65,10 @@ function Login({ onLogin, toggleToRegister }) {
       <form className="login-form" onSubmit={handleLogin}>
         <h2>Login</h2>
         <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          type="email"  // ✅ Change input type to "email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
         />
         <input
