@@ -12,7 +12,7 @@ function Header({ isAuthenticated, user, handleLogout }) {
   return (
     <header className="header">
       <div className="header-left">
-        <h1>Buy & Sell Platform</h1>
+        <h1>Ladyfirst.me</h1>
         <p className="subtitle">Your one-stop marketplace for buying and selling</p>
       </div>
       {isAuthenticated && (
