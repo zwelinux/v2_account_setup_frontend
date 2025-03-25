@@ -70,6 +70,20 @@
   font-weight: bold;
 }
 
+.filters {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.filters select,
+.filters button {
+  padding: 0.5rem;
+  font-size: 0.9rem;
+}
+
 @media (max-width: 1200px) {
   .product-cards {
     grid-template-columns: repeat(3, 1fr);

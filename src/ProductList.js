@@ -8,18 +8,26 @@ function ProductList() {
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [sortBy, setSortBy] = useState('');
+  const [priceRange, setPriceRange] = useState('');
 
   const fetchProducts = async (page = 1) => {
+    const queryParams = new URLSearchParams({
+      page,
+      limit: 20,
+      ...(sortBy && { sort_by: sortBy }),
+      ...(priceRange && { price_range: priceRange }),
+    });
+  
     try {
       const response = await fetch(
-        `https://ladyfirstme.pythonanywhere.com/api/auth/products/?page=${page}&limit=20`,
+        `https://ladyfirstme.pythonanywhere.com/api/auth/products/?${queryParams.toString()}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
-          credentials: 'include'
+          credentials: 'include',
         }
       );
-  
       if (response.ok) {
         const data = await response.json();
         setProducts(data.products);
@@ -48,6 +56,29 @@ function ProductList() {
   return (
     <div className="product-list-container">
       <h2>All Products</h2>
+
+      <div className="filters">
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+          <option value="">Sort By</option>
+          <option value="a_z">A → Z</option>
+          <option value="z_a">Z → A</option>
+          <option value="low_to_high">Price: Low to High</option>
+          <option value="high_to_low">Price: High to Low</option>
+          <option value="date-acs">Oldest First</option>
+          <option value="date-desc">Latest First</option>
+        </select>
+
+        <select value={priceRange} onChange={(e) => setPriceRange(e.target.value)}>
+          <option value="">Price Range</option>
+          <option value="0_50">$0 - $50</option>
+          <option value="50_100">$50 - $100</option>
+          <option value="100_200">$100 - $200</option>
+          <option value="200_99999">$200+</option>
+        </select>
+
+        <button onClick={() => fetchProducts(1)}>Apply</button>
+      </div>
+
       {error && <p className="error-message">{error}</p>}
       <div className="product-cards">
         {products.length > 0 ? (
