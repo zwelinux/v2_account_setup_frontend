@@ -46,6 +46,30 @@
   font-size: 0.9rem;
 }
 
+.pagination {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.page-btn {
+  margin: 0 5px;
+  padding: 0.5rem 1rem;
+  background-color: #f4f4f4;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.page-btn:hover {
+  background-color: #ddd;
+}
+
+.page-btn.active {
+  background-color: #333;
+  color: white;
+  font-weight: bold;
+}
+
 @media (max-width: 1200px) {
   .product-cards {
     grid-template-columns: repeat(3, 1fr);

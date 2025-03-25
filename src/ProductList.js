@@ -6,17 +6,25 @@ import './ProductList.css';
 function ProductList() {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (page = 1) => {
     try {
-      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/products/', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
-      });
+      const response = await fetch(
+        `https://ladyfirstme.pythonanywhere.com/api/auth/products/?page=${page}&limit=20`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include'
+        }
+      );
+  
       if (response.ok) {
         const data = await response.json();
-        setProducts(data.products);  // ✅ FIXED HERE
+        setProducts(data.products);
+        setCurrentPage(data.current_page);
+        setTotalPages(data.total_pages);
       } else {
         setError('Failed to load products.');
       }
@@ -26,7 +34,7 @@ function ProductList() {
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchProducts(1);
   }, []);
 
   // Construct a full URL for the image
@@ -57,6 +65,18 @@ function ProductList() {
         ) : (
           <p>No products found.</p>
         )}
+      </div>
+
+      <div className="pagination">
+        {Array.from({ length: totalPages }, (_, index) => (
+          <button
+            key={index + 1}
+            className={`page-btn ${currentPage === index + 1 ? 'active' : ''}`}
+            onClick={() => fetchProducts(index + 1)}
+          >
+            {index + 1}
+          </button>
+        ))}
       </div>
     </div>
   );
