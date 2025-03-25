@@ -14,6 +14,7 @@ function ProductList() {
   const [selectedBrand, setSelectedBrand] = useState('');
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchCategories = async () => {
     try {
@@ -43,6 +44,7 @@ function ProductList() {
       ...(priceRange && { price_range: priceRange }),
       ...(selectedCategory && { category: selectedCategory }),
       ...(selectedBrand && { brand: selectedBrand }),
+      ...(searchTerm && { keyword: searchTerm }),
       ...customFilters,
     });
   
@@ -85,6 +87,19 @@ function ProductList() {
   return (
     <div className="product-list-container">
       <h2>All Products</h2>
+
+      <div className="search-bar">
+      <input
+        type="text"
+        placeholder="Search products..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') fetchProducts(1, { keyword: searchTerm });
+        }}
+      />
+        <button onClick={() => fetchProducts(1, { keyword: searchTerm })}>Search</button>
+      </div>
 
       <div className="filters">
         <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
