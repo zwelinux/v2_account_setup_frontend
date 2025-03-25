@@ -1,171 +1,65 @@
-/* Container for the entire products list page */
-.my-products-container {
+.product-list-container {
   padding: 1rem;
-  text-align: center;
+  max-width: 1200px; /* ✅ optional */
+  margin: 0 auto;
 }
 
-/* Error message styling */
 .error-message {
-  color: #e74c3c;
+  color: red;
   margin-bottom: 1rem;
 }
 
-/* Product cards container using CSS Grid */
 .product-cards {
   display: grid;
-  gap: 1rem;
+  grid-template-columns: repeat(4, 1fr); /* ✅ Force 4 columns */
+  gap: 1.5rem;
   margin-top: 1rem;
-  /* Automatically fit as many columns as possible, with a minimum width of 280px */
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  justify-items: stretch; /* makes all cards stretch evenly */
 }
 
-/* Product card styling */
 .product-card {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 1rem;
-  background: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease;
+  width: 100%; /* ✅ Let grid control the width */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
 }
 
 .product-card:hover {
   transform: translateY(-5px);
 }
 
-/* Product image: fixed height for consistency and object-fit to cover */
 .product-card img {
   width: 100%;
-  height: 200px;
-  object-fit: cover;
+  height: 200px;      /* Fixed height for consistency */
+  object-fit: cover;  /* Ensures the image covers the area without distortion */
   border-radius: 4px;
-  margin-bottom: 0.5rem;
 }
 
-/* Product title styling */
 .product-card h3 {
   margin: 0.5rem 0;
-  font-size: 1.1rem;
-  color: #333;
 }
 
-/* Product description and price styling */
 .product-card p {
   margin: 0.5rem 0;
   font-size: 0.9rem;
-  color: #555;
 }
 
-/* Delete button styling */
-.edit-btn {
-  background: #e74c3c;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 0.5rem;
-  transition: background 0.3s ease;
+@media (max-width: 1200px) {
+  .product-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
-.delete-btn {
-  background: #e74c3c;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 0.5rem;
-  transition: background 0.3s ease;
+@media (max-width: 768px) {
+  .product-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-.edit-btn:hover  {
-  background: #c0392b;
-}
-
-
-.delete-btn:hover {
-  background: #c0392b;
-}
-
-/* Modal styling */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 400px;
-  text-align: center;
-}
-
-.modal label {
-  display: block;
-  margin-top: 10px;
-  font-weight: bold;
-}
-
-.modal input,
-.modal textarea {
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.save-btn {
-  background: #27ae60;
-  color: white;
-  border: none;
-  padding: 10px;
-  margin-top: 10px;
-  cursor: pointer;
-}
-
-.cancel-btn {
-  background: #e74c3c;
-  color: white;
-  border: none;
-  padding: 10px;
-  margin-left: 10px;
-  cursor: pointer;
-}
-
-.icon-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 0.5rem;
-}
-
-.icon {
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.edit-icon {
-  color: #007bff; /* Blue for edit */
-}
-
-.edit-icon:hover {
-  color: #0056b3;
-}
-
-.delete-icon {
-  color: #e74c3c; /* Red for delete */
-}
-
-.delete-icon:hover {
-  color: #c0392b;
+@media (max-width: 480px) {
+  .product-cards {
+    grid-template-columns: 1fr;
+  }
 }
