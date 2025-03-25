@@ -124,6 +124,23 @@ function ProductList() {
         </select>
 
         <button onClick={() => fetchProducts(1)}>Apply</button>
+        <button
+          style={{ backgroundColor: '#ccc', marginLeft: '0.5rem' }}
+          onClick={() => {
+            setSortBy('');
+            setPriceRange('');
+            setSelectedCategory('');
+            setSelectedBrand('');
+            fetchProducts(1, {
+              sort_by: '',
+              price_range: '',
+              category: '',
+              brand: '',
+            });
+          }}
+        >
+          Reset
+        </button>
       </div>
 
       {error && <p className="error-message">{error}</p>}
