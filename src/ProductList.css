@@ -84,6 +84,11 @@
   font-size: 0.9rem;
 }
 
+
+.filters select {
+  min-width: 150px;
+}
+
 @media (max-width: 1200px) {
   .product-cards {
     grid-template-columns: repeat(3, 1fr);

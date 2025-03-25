@@ -10,13 +10,40 @@ function ProductList() {
   const [totalPages, setTotalPages] = useState(1);
   const [sortBy, setSortBy] = useState('');
   const [priceRange, setPriceRange] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedBrand, setSelectedBrand] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
 
-  const fetchProducts = async (page = 1) => {
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/categories/');
+      const data = await response.json();
+      setCategories(data);
+    } catch (err) {
+      console.error('Failed to load categories:', err);
+    }
+  };
+  
+  const fetchBrands = async () => {
+    try {
+      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/brands/');
+      const data = await response.json();
+      setBrands(data);
+    } catch (err) {
+      console.error('Failed to load brands:', err);
+    }
+  };
+
+  const fetchProducts = async (page = 1, customFilters = {}) => {
     const queryParams = new URLSearchParams({
       page,
       limit: 20,
       ...(sortBy && { sort_by: sortBy }),
       ...(priceRange && { price_range: priceRange }),
+      ...(selectedCategory && { category: selectedCategory }),
+      ...(selectedBrand && { brand: selectedBrand }),
+      ...customFilters,
     });
   
     try {
@@ -43,6 +70,8 @@ function ProductList() {
 
   useEffect(() => {
     fetchProducts(1);
+    fetchCategories();
+    fetchBrands();
   }, []);
 
   // Construct a full URL for the image
@@ -74,6 +103,24 @@ function ProductList() {
           <option value="50_100">$50 - $100</option>
           <option value="100_200">$100 - $200</option>
           <option value="200_99999">$200+</option>
+        </select>
+
+        <select value={selectedCategory} onChange={(e) => setSelectedCategory(Number(e.target.value))}>
+          <option value="">All Categories</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.title}
+            </option>
+          ))}
+        </select>
+
+        <select value={selectedBrand} onChange={(e) => setSelectedBrand(Number(e.target.value))}>
+          <option value="">All Brands</option>
+          {brands.map((brand) => (
+            <option key={brand.id} value={brand.id}>
+              {brand.title}
+            </option>
+          ))}
         </select>
 
         <button onClick={() => fetchProducts(1)}>Apply</button>
