@@ -11,7 +11,7 @@ function LandingPage() {
           alt="Superstar Collection"
         />
         <div className="hero-text">
-          <h1>Refresh Wardrobe</h1>
+          <h1>Refresh Your Wardrobe</h1>
           <p>A streetwear staple, from the basketball court to the street</p>
         </div>
       </div>
