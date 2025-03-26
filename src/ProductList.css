@@ -16,10 +16,8 @@ h2 {
 
 .product-cards {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* flexible */
   gap: 1.5rem;
-  margin-top: 1rem;
-  justify-items: stretch;
 }
 
 .product-card {
@@ -38,10 +36,10 @@ h2 {
 
 .product-card img {
   width: 100%;
-  height: 200px;
-  object-fit: cover;
+  height: auto; /* allow image height to grow naturally */
   border-radius: 4px;
   margin-bottom: 0.5rem;
+  display: block;
 }
 
 .product-card h4 {

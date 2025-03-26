@@ -9,20 +9,15 @@ function LandingProductShowcase() {
     const fetchProducts = async () => {
       try {
         const response = await fetch(
-          'https://ladyfirstme.pythonanywhere.com/api/auth/products/?limit=30'
+          'https://ladyfirstme.pythonanywhere.com/api/auth/products/?sort_by=low_to_high&limit=10'
         );
         const data = await response.json();
 
-        const latestFirst = (data.products || []).sort(
+        const sortedByDateDesc = (data.products || []).sort(
           (a, b) => new Date(b.created_at) - new Date(a.created_at)
         );
 
-        const sortedByPrice = latestFirst.sort(
-          (a, b) => parseFloat(a.second_hand_price) - parseFloat(b.second_hand_price)
-        );
-
-        // Limit to first 10 newest & cheapest products
-        setProducts(sortedByPrice.slice(0, 10));
+        setProducts(sortedByDateDesc);
       } catch (error) {
         console.error('Error fetching products:', error);
       }
@@ -32,18 +27,18 @@ function LandingProductShowcase() {
   }, []);
 
   const scrollRight = () => {
-    rowRef.current?.scrollBy({ left: 300, behavior: 'smooth' });
+    if (rowRef.current) rowRef.current.scrollBy({ left: 300, behavior: 'smooth' });
   };
 
   const scrollLeft = () => {
-    rowRef.current?.scrollBy({ left: -300, behavior: 'smooth' });
+    if (rowRef.current) rowRef.current.scrollBy({ left: -300, behavior: 'smooth' });
   };
 
   return (
     <div className="product-showcase-container">
       <div className="product-showcase-header">
         <div className="product-tabs">
-          <button className="product-tab active">Latest Deals</button>
+          <button className="product-tab active">Latest Arrivals</button>
         </div>
         <a href="/products?sort_by=low_to_high" className="view-all">VIEW ALL PRODUCTS</a>
       </div>
