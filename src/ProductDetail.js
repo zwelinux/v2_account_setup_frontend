@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom'; // ✅ Add Link
 import './ProductDetail.css';
 
 function ProductDetail() {
@@ -67,7 +67,6 @@ function ProductDetail() {
         </div>
       </div>
 
-      {/* ✅ Store Card Section */}
       {product.seller && (
         <div className="store-card">
           <div className="store-left">
@@ -77,14 +76,19 @@ function ProductDetail() {
             <div className="store-info">
               <h3>{product.seller.username || 'Seller'}</h3>
               <div className="store-tags">
-                <span className="tag">{product.seller.city || 'City'}, {product.seller.province || 'Province'}</span>
-                <span className="tag">{product.seller.country || 'Country'}</span>
+                <span className="tag">📞 {product.seller.phone_number || 'N/A'}</span>
+                <span className="tag">✉️ {product.seller.email || 'N/A'}</span>
+                <span className="tag">📍 {product.seller.city || 'City'}, {product.seller.province || 'Province'}, {product.seller.country || 'Country'}</span>
               </div>
             </div>
           </div>
           <div className="store-actions">
             <button className="btn-store-outline">💬 Chat</button>
-            <button className="btn-store-outline">🏪 Go to Store</button>
+
+            {/* ✅ Navigate to seller profile */}
+            <Link to={`/profile/${product.seller.username}`} className="btn-store-outline">
+              🏪 Go to Store
+            </Link>
           </div>
         </div>
       )}
