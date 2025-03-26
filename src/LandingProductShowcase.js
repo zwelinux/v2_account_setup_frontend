@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './LandingProductShowcase.css';
+import { Link } from 'react-router-dom';
+
 
 function LandingProductShowcase() {
   const [products, setProducts] = useState([]);
@@ -49,12 +51,14 @@ function LandingProductShowcase() {
         <div className="product-cards-row" ref={rowRef}>
           {products.length > 0 ? (
             products.map((product) => (
-              <div key={product.id} className="product-card">
-                <img src={product.image_url} alt={product.title} />
-                <div className="price">฿{product.second_hand_price}</div>
-                <h4>{product.title}</h4>
-                <p>{product.category_name} | {product.brand_name}</p>
-              </div>
+              <Link key={product.id} to={`/products/${product.id}`} className="product-link">
+                <div className="product-card">
+                  <img src={product.image_url} alt={product.title} />
+                  <div className="price">฿{product.second_hand_price}</div>
+                  <h4>{product.title}</h4>
+                  <p>{product.category_name} | {product.brand_name}</p>
+                </div>
+              </Link>
             ))
           ) : (
             <p style={{ padding: '1rem' }}>Loading products...</p>

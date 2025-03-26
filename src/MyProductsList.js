@@ -1,3 +1,4 @@
+// MyProductsList.js
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { FaEdit, FaTrash } from "react-icons/fa";
@@ -13,10 +14,8 @@ function MyProductsList({ refresh }) {
     second_hand_price: "",
   });
 
-  // ✅ Get JWT access token from localStorage
   const getAccessToken = () => localStorage.getItem("access_token");
 
-  // ✅ Fetch the user's products with Authorization header
   const fetchMyProducts = useCallback(async () => {
     const token = getAccessToken();
     if (!token) {
@@ -43,13 +42,12 @@ function MyProductsList({ refresh }) {
     } catch (err) {
       setError("Error: " + err.message);
     }
-  }, []); // ✅ No unnecessary dependencies
+  }, []);
 
   useEffect(() => {
     fetchMyProducts();
   }, [fetchMyProducts, refresh]);
 
-  // ✅ Delete a product (Authenticated User Only)
   const handleDelete = async (id) => {
     const token = getAccessToken();
     if (!token) {
@@ -74,12 +72,10 @@ function MyProductsList({ refresh }) {
         setError(`Delete failed with status ${response.status}.`);
       }
     } catch (error) {
-      console.error("Error deleting product:", error);
       setError("Error deleting product: " + error.message);
     }
   };
 
-  // ✅ Open the Edit Modal
   const openEditForm = (product) => {
     setEditProduct(product);
     setFormData({
@@ -89,15 +85,12 @@ function MyProductsList({ refresh }) {
     });
   };
 
-  // ✅ Handle input changes in the edit form
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ✅ Update product details (PUT request)
   const handleEdit = async () => {
     if (!editProduct) return;
-
     const token = getAccessToken();
     if (!token) {
       setError("Error: Authentication token not found.");
@@ -126,14 +119,12 @@ function MyProductsList({ refresh }) {
             product.id === editProduct.id ? { ...product, ...updatedData } : product
           )
         );
-        setEditProduct(null); // ✅ Close the modal
+        setEditProduct(null);
       } else {
         const errorData = await response.json();
-        console.error("Update failed:", errorData);
         setError(`Update failed: ${JSON.stringify(errorData)}`);
       }
     } catch (error) {
-      console.error("Error updating product:", error);
       setError("Error updating product: " + error.message);
     }
   };
@@ -149,16 +140,15 @@ function MyProductsList({ refresh }) {
             <div className="product-card" key={product.id}>
               <Link to={`/products/${product.id}`} className="product-link">
                 <img
-                  src={
-                    product.image.startsWith("http")
-                      ? product.image
-                      : `https://ladyfirstme.pythonanywhere.com/media/${product.image}`
-                  }
+                  src={product.image.startsWith("http") ? product.image : `https://ladyfirstme.pythonanywhere.com/media/${product.image}`}
                   alt={product.title}
                 />
-                <h3>{product.title}</h3>
-                {/* <p>{product.description}</p> */}
-                <p>Price: ${product.second_hand_price}</p>
+                <div className="card-body">
+                  <h3>{product.title}</h3>
+                  <p className="price">฿{product.second_hand_price}</p>
+                  <p>{product.category_name} | {product.brand_name}</p>
+                </div>
+
               </Link>
 
               <div className="icon-buttons">
@@ -172,19 +162,23 @@ function MyProductsList({ refresh }) {
         )}
       </div>
 
-      {/* ✅ Edit Product Modal */}
       {editProduct && (
         <div className="modal">
           <div className="modal-content">
             <h3>Edit Product</h3>
             <label>Title:</label>
             <input type="text" name="title" value={formData.title} onChange={handleChange} />
-            
+
             <label>Description:</label>
             <textarea name="description" value={formData.description} onChange={handleChange}></textarea>
-            
+
             <label>Price:</label>
-            <input type="number" name="second_hand_price" value={formData.second_hand_price} onChange={handleChange} />
+            <input
+              type="number"
+              name="second_hand_price"
+              value={formData.second_hand_price}
+              onChange={handleChange}
+            />
 
             <button onClick={handleEdit} className="save-btn">Save</button>
             <button onClick={() => setEditProduct(null)} className="cancel-btn">Cancel</button>

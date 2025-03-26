@@ -29,6 +29,16 @@ h2 {
   width: 100%;
 }
 
+.product-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.product-link:hover {
+  text-decoration: none;
+  color: inherit;
+}
+
 .product-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);

@@ -59,12 +59,22 @@
   }
   
   .product-card {
-    flex: 0 0 250px;
     border: 1px solid #eee;
-    border-radius: 6px;
+    border-radius: 8px;
     padding: 1rem;
     background-color: #f9f9f9;
     transition: transform 0.3s ease;
+    width: 100%;
+  }
+  
+  .product-link {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .product-link:hover {
+    text-decoration: none;
+    color: inherit;
   }
 
 
