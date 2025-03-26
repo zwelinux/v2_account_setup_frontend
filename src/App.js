@@ -10,6 +10,7 @@ import UserProfile from './UserProfile';
 import ProductDetail from './ProductDetail';
 import Header from './Header';
 import './App.css';
+import Footer from './Footer';
 
 function AppContent() {
   const navigate = useNavigate();
@@ -126,6 +127,7 @@ function AppContent() {
   return (
     <div className="app-container">
       <Header isAuthenticated={isAuthenticated} user={user} handleLogout={handleLogout} />
+
       <main>
         <Routes>
           <Route path="/profile/:username" element={<UserProfile />} />
@@ -153,6 +155,7 @@ function AppContent() {
           )}
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 }

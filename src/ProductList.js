@@ -160,21 +160,21 @@ function ProductList() {
 
       {error && <p className="error-message">{error}</p>}
       <div className="product-cards">
-        {products.length > 0 ? (
-          products.map((product) => (
-            // Wrap each card in a Link so that clicking it navigates to the product detail page
-            <Link key={product.id} to={`/products/${product.id}`} className="product-link">
-              <div className="product-card">
-                <img src={getImageUrl(product)} alt={product.title} />
-                <h3>{product.title}</h3>
-                <p>{product.description}</p>
-                <p>Price: ${product.second_hand_price}</p>
-              </div>
-            </Link>
-          ))
-        ) : (
-          <p>No products found.</p>
-        )}
+      {products.length > 0 ? (
+        products.map((product) => (
+          <Link key={product.id} to={`/products/${product.id}`} className="product-link">
+            <div className="product-card">
+              <img src={product.image_url} alt={product.title} />
+              <div className="price">฿{product.second_hand_price}</div>
+              <h4>{product.title}</h4>
+              <p>{product.category_name} | {product.brand_name}</p>
+            </div>
+          </Link>
+        ))
+      ) : (
+        <p>No products found.</p>
+      )}
+
       </div>
 
       <div className="pagination">

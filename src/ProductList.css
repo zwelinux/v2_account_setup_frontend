@@ -1,3 +1,8 @@
+h2 {
+  text-align: center;
+  font-size: 2em;
+}
+
 .product-list-container {
   padding: 1rem;
   max-width: 1200px; /* ✅ optional */
@@ -11,39 +16,48 @@
 
 .product-cards {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* ✅ Force 4 columns */
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   margin-top: 1rem;
-  justify-items: stretch; /* makes all cards stretch evenly */
+  justify-items: stretch;
 }
 
 .product-card {
-  border: 1px solid #ddd;
+  border: 1px solid #eee;
   border-radius: 8px;
   padding: 1rem;
-  width: 100%; /* ✅ Let grid control the width */
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: transform 0.2s;
+  background-color: #f9f9f9;
+  transition: transform 0.3s ease;
+  width: 100%;
 }
 
 .product-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .product-card img {
   width: 100%;
-  height: 200px;      /* Fixed height for consistency */
-  object-fit: cover;  /* Ensures the image covers the area without distortion */
+  height: 200px;
+  object-fit: cover;
   border-radius: 4px;
+  margin-bottom: 0.5rem;
 }
 
-.product-card h3 {
-  margin: 0.5rem 0;
+.product-card h4 {
+  font-size: 1rem;
+  margin: 0.2rem 0;
+}
+
+.product-card .price {
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+  color: #111;
 }
 
 .product-card p {
-  margin: 0.5rem 0;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  color: #666;
 }
 
 .pagination {
