@@ -1,56 +1,35 @@
-// src/Header.js
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaShareAlt, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa';
+import { FaSortDown, FaPowerOff } from 'react-icons/fa';
 import './Header.css';
 
 function Header({ isAuthenticated, user, handleLogout }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
   const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
 
   return (
     <header className="header">
+      {/* Left: Logo and Subtitle */}
       <div className="header-left">
         <h1>Ladyfirst.me</h1>
         <p className="subtitle">Your one-stop marketplace for buying and selling</p>
       </div>
+
+      {/* Right: Navigation and Hamburger */}
       {isAuthenticated && (
         <div className="header-right">
           <button className="hamburger" onClick={toggleMobileMenu}>
-            {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+            <FaSortDown size={30} />
           </button>
           <nav className={`nav ${isMobileMenuOpen ? 'active' : ''}`}>
             <ul>
+              <li><Link to="/dashboard" onClick={toggleMobileMenu}>Dashboard</Link></li>
+              <li><Link to="/profile" onClick={toggleMobileMenu}>Own Products</Link></li>
+              <li><Link to="/upload" onClick={toggleMobileMenu}>Sell New</Link></li>
+              <li><Link to={`/profile/${user.username}`} onClick={toggleMobileMenu}>Profile</Link></li>
               <li>
-                <Link to="/dashboard" onClick={toggleMobileMenu}>
-                  Dashboard
-                </Link>
-              </li>
-              <li>
-                <Link to="/profile" onClick={toggleMobileMenu}>
-                  My Products
-                </Link>
-              </li>
-              <li>
-                <Link to="/upload" onClick={toggleMobileMenu}>
-                  Upload Product
-                </Link>
-              </li>
-              <li>
-                <Link to={`/profile/${user.username}`} onClick={toggleMobileMenu}>
-                  <FaShareAlt title="Share Profile" size={20} />
-                </Link>
-              </li>
-              <li>
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    toggleMobileMenu();
-                  }}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-                >
-                  <FaSignOutAlt title="Logout" size={20} />
+                <button onClick={() => { handleLogout(); toggleMobileMenu(); }} className="logout-button">
+                  <FaPowerOff />
                 </button>
               </li>
             </ul>

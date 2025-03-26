@@ -19,11 +19,12 @@
   }
   
   .product-tab {
-    padding: 0.5rem 1rem;
+    padding: 1rem 1rem;
     border: 1px solid #000;
     background-color: transparent;
     color: #000;
     font-weight: bold;
+    font-size: 1em;
     cursor: pointer;
     transition: all 0.3s ease;
   }
@@ -76,7 +77,7 @@
     text-decoration: none;
     color: inherit;
   }
-    
+
   .product-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);

@@ -88,20 +88,10 @@ function ProductList() {
     <div className="product-list-container">
       <h2>All Products</h2>
 
-      <div className="search-bar">
-      <input
-        type="text"
-        placeholder="Search products..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') fetchProducts(1, { keyword: searchTerm });
-        }}
-      />
-        <button onClick={() => fetchProducts(1, { keyword: searchTerm })}>Search</button>
-      </div>
+     
 
-      <div className="filters">
+      <div className="filter-bar">
+
         <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
           <option value="">Sort By</option>
           <option value="a_z">A → Z</option>
@@ -137,10 +127,11 @@ function ProductList() {
             </option>
           ))}
         </select>
-
-        <button onClick={() => fetchProducts(1)}>Apply</button>
+        
+        <button onClick={() => fetchProducts(1)} className='apply'>Apply</button>
         <button
-          style={{ backgroundColor: '#ccc', marginLeft: '0.5rem' }}
+          style={{ backgroundColor: '#ccc', marginLeft: '0rem' }}
+          className='reset'
           onClick={() => {
             setSortBy('');
             setPriceRange('');
@@ -157,6 +148,20 @@ function ProductList() {
           Reset
         </button>
       </div>
+
+      <div className="search-bar">
+        <input
+          type="text"
+          placeholder="Search products..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') fetchProducts(1, { keyword: searchTerm });
+          }}
+        />
+        <button onClick={() => fetchProducts(1, { keyword: searchTerm })}>Search</button>
+      </div>
+
 
       {error && <p className="error-message">{error}</p>}
       <div className="product-cards">
