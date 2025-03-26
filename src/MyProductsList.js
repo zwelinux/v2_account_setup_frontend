@@ -157,7 +157,7 @@ function MyProductsList({ refresh }) {
                   alt={product.title}
                 />
                 <h3>{product.title}</h3>
-                <p>{product.description}</p>
+                {/* <p>{product.description}</p> */}
                 <p>Price: ${product.second_hand_price}</p>
               </Link>
 
