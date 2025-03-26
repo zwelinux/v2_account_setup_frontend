@@ -68,24 +68,26 @@ function ProductDetail() {
       </div>
 
       {/* ✅ Store Card Section */}
-      <div className="store-card">
-        <div className="store-left">
-          <div className="store-logo">B</div>
-          <div className="store-info">
-            <h3>Big fashion168</h3>
-            <div className="store-tags">
-              <span className="tag">Store rating 95%</span>
-              <span className="tag">Recommended shop</span>
-              <span className="tag">Fast response: 1 min</span>
+      {product.seller && (
+        <div className="store-card">
+          <div className="store-left">
+            <div className="store-logo">
+              {product.seller.username ? product.seller.username.charAt(0).toUpperCase() : 'S'}
+            </div>
+            <div className="store-info">
+              <h3>{product.seller.username || 'Seller'}</h3>
+              <div className="store-tags">
+                <span className="tag">{product.seller.city || 'City'}, {product.seller.province || 'Province'}</span>
+                <span className="tag">{product.seller.country || 'Country'}</span>
+              </div>
             </div>
           </div>
+          <div className="store-actions">
+            <button className="btn-store-outline">💬 Chat</button>
+            <button className="btn-store-outline">🏪 Go to Store</button>
+          </div>
         </div>
-        <div className="store-actions">
-          <button className="btn-store-outline">💬 Chat</button>
-          <button className="btn-store-outline">🏪 Go to Store</button>
-        </div>
-      </div>
-
+      )}
     </>
   );
 }
