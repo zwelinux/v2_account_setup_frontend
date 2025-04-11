@@ -30,7 +30,7 @@ function Checkout() {
       if (!token) return;
 
       try {
-        const response = await fetch("http://localhost:8000/api/auth/user/", {
+        const response = await fetch("https://ladyfirstme.pythonanywhere.com/api/auth/user/", {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -62,7 +62,7 @@ function Checkout() {
     if (!token) return;
 
     try {
-      const response = await fetch("http://localhost:8000/api/auth/user/", {
+      const response = await fetch("https://ladyfirstme.pythonanywhere.com/api/auth/user/", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -98,7 +98,7 @@ function Checkout() {
 
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:8000/api/auth/place-order/", {
+      const response = await fetch("https://ladyfirstme.pythonanywhere.com/api/auth/place-order/", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

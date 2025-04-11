@@ -7,7 +7,7 @@ function SellerDashboard() {
   const fetchOrders = async () => {
     const token = localStorage.getItem('access_token');
     try {
-      const res = await fetch('http://localhost:8000/api/auth/seller/orders/', {
+      const res = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/seller/orders/', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -27,7 +27,7 @@ function SellerDashboard() {
   const handleStatusChange = async (orderId, newStatus) => {
     const token = localStorage.getItem('access_token');
     try {
-      const res = await fetch(`http://localhost:8000/api/auth/seller/orders/${orderId}/update-status/`, {
+      const res = await fetch(`https://ladyfirstme.pythonanywhere.com/api/auth/seller/orders/${orderId}/update-status/`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

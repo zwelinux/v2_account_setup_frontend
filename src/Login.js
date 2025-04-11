@@ -19,7 +19,7 @@ function Login({ onLogin, toggleToRegister }) {
 
       console.log('Login Payload:', payload);
 
-      const response = await fetch('http://localhost:8000/api/auth/login/', {
+      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/login/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ function Login({ onLogin, toggleToRegister }) {
 
   const fetchUserData = async (token) => {
     try {
-      const response = await fetch('http://localhost:8000/api/auth/user/', {
+      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/user/', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

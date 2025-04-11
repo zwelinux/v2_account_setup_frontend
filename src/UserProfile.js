@@ -14,7 +14,7 @@ function UserProfile() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/auth/profile/${username}/`, {
+        const response = await fetch(`https://ladyfirstme.pythonanywhere.com/api/auth/profile/${username}/`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           // Removed credentials: 'include' to allow public access
@@ -40,7 +40,7 @@ function UserProfile() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/auth/profile/${username}/products/`, {
+        const response = await fetch(`https://ladyfirstme.pythonanywhere.com/api/auth/profile/${username}/products/`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           // Removed credentials: 'include' to allow public access
@@ -75,8 +75,8 @@ function UserProfile() {
           src={profile.profile_picture 
             ? (profile.profile_picture.startsWith('http') 
               ? profile.profile_picture 
-              : `http://localhost:8000/media/${profile.profile_picture}`)
-            : 'http://localhost:8000/media/default_profile.jpg'}
+              : `https://ladyfirstme.pythonanywhere.com/media/${profile.profile_picture}`)
+            : 'https://ladyfirstme.pythonanywhere.com/media/default_profile.jpg'}
           alt={`${profile.username}'s profile`}
         />
 
@@ -97,7 +97,7 @@ function UserProfile() {
               <Link to={`/products/${product.id}`} className="product-link">
                 <img
                   className="product-image"
-                  src={product.image_url ? product.image_url : `http://localhost:8000/media/${product.image}`}
+                  src={product.image_url ? product.image_url : `https://ladyfirstme.pythonanywhere.com/media/${product.image}`}
                   alt={product.title}
                 />
                 <h4>{product.title}</h4>
