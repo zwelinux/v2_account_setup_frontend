@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom'; // ✅ Add Link
+import { useParams, Link } from 'react-router-dom';
 import './ProductDetail.css';
 
 function ProductDetail() {
@@ -10,7 +10,7 @@ function ProductDetail() {
   useEffect(() => {
     async function fetchProduct() {
       try {
-        const response = await fetch(`https://ladyfirstme.pythonanywhere.com/api/auth/products/${id}/`);
+        const response = await fetch(`http://localhost:8000/api/auth/products/${id}/`);
         const data = await response.json();
         if (response.ok) {
           setProduct(data);
@@ -32,12 +32,34 @@ function ProductDetail() {
     ? Math.round(((parseFloat(product.original_price) - parseFloat(product.second_hand_price)) / parseFloat(product.original_price)) * 100)
     : 0;
 
+  const handleAddToCart = () => {
+    const existingCart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    const newItem = {
+      id: product.id,
+      title: product.title,
+      price: product.second_hand_price,
+      image: product.image_url || `http://localhost:8000/media/${product.image}`,
+      quantity: 1,
+    };
+
+    const isAlreadyInCart = existingCart.find((item) => item.id === product.id);
+
+    if (!isAlreadyInCart) {
+      existingCart.push(newItem);
+      localStorage.setItem('cart', JSON.stringify(existingCart));
+      alert('Added to cart!');
+    } else {
+      alert('Item already in cart!');
+    }
+  };
+
   return (
     <>
       <div className="product-detail-wrapper">
         <div className="product-detail-left">
           <img
-            src={product.image_url || `https://ladyfirstme.pythonanywhere.com/media/${product.image}`}
+            src={product.image_url || `http://localhost:8000/media/${product.image}`}
             alt={product.title}
           />
         </div>
@@ -62,7 +84,7 @@ function ProductDetail() {
 
           <div className="product-detail-buttons">
             <button className="btn-outline-black">Buy Now</button>
-            <button className="btn-filled-black">Add to Cart</button>
+            <button className="btn-filled-black" onClick={handleAddToCart}>Add to Cart</button>
           </div>
         </div>
       </div>
@@ -83,9 +105,7 @@ function ProductDetail() {
             </div>
           </div>
           <div className="store-actions">
-            <button className="btn-store-outline">💬 Chat</button>
-
-            {/* ✅ Navigate to seller profile */}
+            <Link>💬 Chat</Link>
             <Link to={`/profile/${product.seller.username}`} className="btn-store-outline">
               🏪 Go to Store
             </Link>

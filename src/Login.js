@@ -1,62 +1,67 @@
+// frontend/src/Login.js
 import React, { useState } from 'react';
 import './Login.css';
 
 function Login({ onLogin, toggleToRegister }) {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [isEmailLogin, setIsEmailLogin] = useState(true);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setMessage('');
 
     try {
-      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/token/', {
+      const payload = isEmailLogin
+        ? { email: identifier, password }
+        : { phone_number: identifier, password };
+
+      console.log('Login Payload:', payload);
+
+      const response = await fetch('http://localhost:8000/api/auth/login/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }), // ✅ Use "email" instead of "username"
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
       });
 
       const json = await response.json();
+      console.log('Login Response:', json);
 
       if (response.ok) {
-        // ✅ Store tokens in localStorage
         localStorage.setItem('access_token', json.access);
         localStorage.setItem('refresh_token', json.refresh);
-
-        setMessage("Logged in successfully!");
-
-        // ✅ Fetch user details immediately after login
+        setMessage('Logged in successfully!');
         fetchUserData(json.access);
-
-        onLogin(); // Notify parent component that login was successful.
+        onLogin();
       } else {
-        setMessage(json.detail || "Login failed");
+        setMessage(json.error || 'Login failed');
       }
     } catch (error) {
-      setMessage("Error: " + error.message);
+      setMessage('Error: ' + error.message);
     }
   };
 
-  // ✅ Fetch user details using the access token
   const fetchUserData = async (token) => {
     try {
-      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/user/', {
+      const response = await fetch('http://localhost:8000/api/auth/user/', {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`,  // ✅ Send token in Authorization header
-          'Content-Type': 'application/json'
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       });
 
       if (response.ok) {
         const userData = await response.json();
-        console.log("User data:", userData);
+        console.log('User data:', userData);
       } else {
-        setMessage("Failed to fetch user details");
+        setMessage('Failed to fetch user details');
       }
     } catch (error) {
-      setMessage("Error fetching user: " + error.message);
+      setMessage('Error fetching user: ' + error.message);
     }
   };
 
@@ -64,11 +69,25 @@ function Login({ onLogin, toggleToRegister }) {
     <div className="login-container">
       <form className="login-form" onSubmit={handleLogin}>
         <h2>Login</h2>
+        <div className="login-toggle">
+          <span
+            className={`login-option ${isEmailLogin ? 'active' : ''}`}
+            onClick={() => setIsEmailLogin(true)}
+          >
+            Email
+          </span>
+          <span
+            className={`login-option ${!isEmailLogin ? 'active' : ''}`}
+            onClick={() => setIsEmailLogin(false)}
+          >
+            Phone Number
+          </span>
+        </div>
         <input
-          type="email"  // ✅ Change input type to "email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          placeholder={isEmailLogin ? 'Email' : 'Phone Number'}
+          value={identifier}
+          onChange={(e) => setIdentifier(e.target.value)}
           required
         />
         <input
@@ -81,7 +100,7 @@ function Login({ onLogin, toggleToRegister }) {
         <button type="submit">Login</button>
         {message && <p className="message">{message}</p>}
         <p className="toggle-text">
-          Don't have an account?{" "}
+          Don't have an account?{' '}
           <span className="toggle-link" onClick={toggleToRegister}>
             Create one.
           </span>

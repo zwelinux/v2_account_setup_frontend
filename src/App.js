@@ -11,6 +11,13 @@ import ProductDetail from './ProductDetail';
 import Header from './Header';
 import './App.css';
 import Footer from './Footer';
+import Cart from './Cart';
+import Checkout from './Checkout';
+import OrderHistory from './OrderHistory';
+import SellerDashboard from './SellerDashboard';
+import InboxPage from './InboxPage';
+
+
 
 function AppContent() {
   const navigate = useNavigate();
@@ -22,7 +29,7 @@ function AppContent() {
   // ✅ Logout Function
   const handleLogout = useCallback(async () => {
     try {
-      await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/logout/', {
+      await fetch('http://localhost:8000/api/auth/logout/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -51,7 +58,7 @@ function AppContent() {
     }
 
     try {
-      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/user/', {
+      const response = await fetch('http://localhost:8000/api/auth/user/', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -88,7 +95,7 @@ function AppContent() {
     }
 
     try {
-      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/token/refresh/', {
+      const response = await fetch('http://localhost:8000/api/auth/token/refresh/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh: refresh_token }),
@@ -138,6 +145,11 @@ function AppContent() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/upload" element={<UploadProduct />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/orders" element={<OrderHistory />} />
+              <Route path="/seller/dashboard" element={<SellerDashboard />} />
+              <Route path="/inbox" element={<InboxPage />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </>
           ) : (

@@ -11,6 +11,8 @@ function Footer() {
   return (
     <footer className="footer">
       {/* Yellow Top Banner */}
+
+
       <div className="footer-banner">
         <h2>YOU CAN BE A SELLER</h2>
         <button>SIGN UP FOR FREE →</button>
@@ -19,7 +21,7 @@ function Footer() {
       {/* Main Footer Section */}
       <div className="footer-main">
         <div className="footer-column">
-          <h3>Products</h3>
+          <h3 className='footer-h3'>Products</h3>
           <ul>
             <li><a href="#">Shirt</a></li>
             <li><a href="#">Jacket</a></li>
@@ -28,7 +30,7 @@ function Footer() {
         </div>
 
         <div className="footer-column">
-          <h3>Brands</h3>
+          <h3 className='footer-h3'>Brands</h3>
           <ul>
             <li><a href="#">Zara</a></li>
             <li><a href="#">Adidas</a></li>
@@ -37,7 +39,7 @@ function Footer() {
         </div>
 
         <div className="footer-column">
-          <h3>Company Info</h3>
+          <h3 className='footer-h3'>Company Info</h3>
           <ul>
             <li><a href="#">About Us</a></li>
             <li><a href="#">Careers</a></li>
@@ -46,7 +48,7 @@ function Footer() {
         </div>
 
         <div className="footer-column">
-          <h3>Support</h3>
+          <h3 className='footer-h3'>Support</h3>
           <ul>
             <li><a href="#">Help</a></li>
             <li><a href="#">Returns</a></li>
@@ -58,7 +60,7 @@ function Footer() {
         </div>
 
         <div className="footer-column">
-          <h3>Follow Us</h3>
+          <h3 className='footer-h3'>Follow Us</h3>
           <div className="footer-socials">
             <a href="https://facebook.com" target="_blank" rel="noreferrer"><FaFacebookF /></a>
             <a href="https://twitter.com" target="_blank" rel="noreferrer"><FaTwitter /></a>

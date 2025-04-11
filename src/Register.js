@@ -83,7 +83,6 @@ function Register({ onRegisterSuccess, toggleToLogin }) {
     setMessage('');
     if (step > 1) setStep(step - 1);
   };
-  
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -103,7 +102,7 @@ function Register({ onRegisterSuccess, toggleToLogin }) {
     }
   
     try {
-      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/register/', {
+      const response = await fetch('http://localhost:8000/api/auth/register/', {
         method: 'POST',
         headers: { 'Accept': 'application/json' },  // ✅ No authentication required
         body: data,
@@ -135,7 +134,7 @@ function Register({ onRegisterSuccess, toggleToLogin }) {
   // ✅ Fetch user details with the access token
   const fetchUserData = async (token) => {
     try {
-      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/user/', {
+      const response = await fetch('http://localhost:8000/api/auth/user/', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,  // ✅ Send token in Authorization header

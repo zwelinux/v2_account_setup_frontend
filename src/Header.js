@@ -26,7 +26,11 @@ function Header({ isAuthenticated, user, handleLogout }) {
               <li><Link to="/dashboard" onClick={toggleMobileMenu}>Dashboard</Link></li>
               <li><Link to="/profile" onClick={toggleMobileMenu}>Own Products</Link></li>
               <li><Link to="/upload" onClick={toggleMobileMenu}>Sell New</Link></li>
+              <li><Link to="/seller/dashboard">Seller Dashboard</Link></li>
               <li><Link to={`/profile/${user.username}`} onClick={toggleMobileMenu}>Profile</Link></li>
+              <li><Link to="/cart">Go to Cart</Link></li>
+              <li><Link to="/orders">📦 My Orders</Link></li>
+              <li><Link to="/inbox">📥 Inbox</Link></li>
               <li>
                 <button onClick={() => { handleLogout(); toggleMobileMenu(); }} className="logout-button">
                   <FaPowerOff />
