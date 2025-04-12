@@ -10,7 +10,7 @@ function ProductDetail() {
   useEffect(() => {
     async function fetchProduct() {
       try {
-        const response = await fetch(`http://localhost:8000/api/auth/products/${id}/`);
+        const response = await fetch(`https://ladyfirstme.pythonanywhere.com/api/auth/products/${id}/`);
         const data = await response.json();
         if (response.ok) {
           setProduct(data);
@@ -39,7 +39,7 @@ function ProductDetail() {
       id: product.id,
       title: product.title,
       price: product.second_hand_price,
-      image: product.image_url || `http://localhost:8000/media/${product.image}`,
+      image: product.image_url || `https://ladyfirstme.pythonanywhere.com/media/${product.image}`,
       quantity: 1,
     };
 
@@ -59,7 +59,7 @@ function ProductDetail() {
       <div className="product-detail-wrapper">
         <div className="product-detail-left">
           <img
-            src={product.image_url || `http://localhost:8000/media/${product.image}`}
+            src={product.image_url || `https://ladyfirstme.pythonanywhere.com/media/${product.image}`}
             alt={product.title}
           />
         </div>

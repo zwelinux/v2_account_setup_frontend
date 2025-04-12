@@ -11,7 +11,7 @@ function LandingProductShowcase() {
     const fetchProducts = async () => {
       try {
         const response = await fetch(
-          'http://localhost:8000/api/auth/products/?sort_by=low_to_high&limit=10'
+          'https://ladyfirstme.pythonanywhere.com/api/auth/products/?sort_by=low_to_high&limit=10'
         );
         const data = await response.json();
 

@@ -12,7 +12,7 @@ function InboxPage() {
 
     const fetchConversations = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/auth/messages/inbox/', {
+        const res = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/messages/inbox/', {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
