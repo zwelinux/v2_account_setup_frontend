@@ -1,16 +1,34 @@
-// frontend/src/Login.js
+// src/Login.js
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import './Login.css';
 
 function Login({ onLogin, toggleToRegister }) {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
   const [isEmailLogin, setIsEmailLogin] = useState(true);
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^\+?\d{10,15}$/;
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setMessage('');
+    setError('');
+
+    if (isEmailLogin) {
+      if (!emailRegex.test(identifier)) {
+        setError('Please enter a valid email address.');
+        return;
+      }
+    } else {
+      if (!phoneRegex.test(identifier)) {
+        setError('Please enter a valid phone number (10-15 digits, optional +).');
+        return;
+      }
+    }
 
     try {
       const payload = isEmailLogin
@@ -19,7 +37,7 @@ function Login({ onLogin, toggleToRegister }) {
 
       console.log('Login Payload:', payload);
 
-      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/login/', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/login/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -46,7 +64,7 @@ function Login({ onLogin, toggleToRegister }) {
 
   const fetchUserData = async (token) => {
     try {
-      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/user/', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/user/`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -99,11 +117,15 @@ function Login({ onLogin, toggleToRegister }) {
         />
         <button type="submit">Login</button>
         {message && <p className="message">{message}</p>}
+        {error && <p className="error">{error}</p>}
         <p className="toggle-text">
           Don't have an account?{' '}
           <span className="toggle-link" onClick={toggleToRegister}>
             Create one.
           </span>
+        </p>
+        <p className="forgot-password">
+          <Link to="/forgot-password">Forgot Password?</Link>
         </p>
       </form>
     </div>

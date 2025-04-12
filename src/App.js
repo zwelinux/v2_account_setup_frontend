@@ -9,15 +9,15 @@ import UploadProduct from './UploadProduct';
 import UserProfile from './UserProfile';
 import ProductDetail from './ProductDetail';
 import Header from './Header';
-import './App.css';
 import Footer from './Footer';
 import Cart from './Cart';
 import Checkout from './Checkout';
 import OrderHistory from './OrderHistory';
 import SellerDashboard from './SellerDashboard';
 import InboxPage from './InboxPage';
-
-
+import ForgotPassword from './ForgotPassword';  // New component
+import ResetPassword from './ResetPassword';    // New component
+import './App.css';
 
 function AppContent() {
   const navigate = useNavigate();
@@ -26,15 +26,13 @@ function AppContent() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Logout Function
   const handleLogout = useCallback(async () => {
     try {
-      await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/logout/', {
+      await fetch('http://localhost:8000/api/auth/logout/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
       });
-
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       setUser(null);
@@ -45,27 +43,23 @@ function AppContent() {
     }
   }, [navigate]);
 
-  // ✅ Fetch Authenticated User
   const checkUser = useCallback(async () => {
     setLoading(true);
     const token = localStorage.getItem('access_token');
-
     if (!token) {
       setUser(null);
       setIsAuthenticated(false);
       setLoading(false);
       return;
     }
-
     try {
-      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/user/', {
+      const response = await fetch('http://localhost:8000/api/auth/user/', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
-
       if (response.ok) {
         const data = await response.json();
         setUser(data);
@@ -83,28 +77,24 @@ function AppContent() {
     } finally {
       setLoading(false);
     }
-  }, []); // ❌ No dependency on `refreshToken` (breaks circular dependency)
+  }, []);
 
-  // ✅ Refresh Access Token
   const refreshToken = useCallback(async () => {
     const refresh_token = localStorage.getItem('refresh_token');
-
     if (!refresh_token) {
       setIsAuthenticated(false);
       return;
     }
-
     try {
-      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/token/refresh/', {
+      const response = await fetch('http://localhost:8000/api/auth/token/refresh/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh: refresh_token }),
       });
-
       if (response.ok) {
         const json = await response.json();
         localStorage.setItem('access_token', json.access);
-        checkUser(); // ✅ Manually call `checkUser` without a dependency
+        checkUser();
       } else {
         handleLogout();
       }
@@ -112,14 +102,12 @@ function AppContent() {
       console.error('Error refreshing token:', error);
       handleLogout();
     }
-  }, [handleLogout]); // ✅ Depends only on `handleLogout`
+  }, [handleLogout]);
 
-  // ✅ Check user session on mount
   useEffect(() => {
     checkUser();
   }, [checkUser]);
 
-  // ✅ Handle successful login
   const handleLoginSuccess = () => {
     checkUser();
   };
@@ -134,12 +122,12 @@ function AppContent() {
   return (
     <div className="app-container">
       <Header isAuthenticated={isAuthenticated} user={user} handleLogout={handleLogout} />
-
       <main>
         <Routes>
           <Route path="/profile/:username" element={<UserProfile />} />
           <Route path="/products/:id" element={<ProductDetail />} />
-
+          <Route path="/forgot-password" element={<ForgotPassword />} />  {/* New */}
+          <Route path="/reset-password/:token" element={<ResetPassword />} />  {/* New */}
           {isAuthenticated ? (
             <>
               <Route path="/dashboard" element={<Dashboard />} />
