@@ -1,7 +1,11 @@
 // src/Login.js
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import countries from './countries';
 import './Login.css';
+
+// Import icons from react-icons
+import { FaPhone, FaEnvelope, FaLock } from 'react-icons/fa';
 
 function Login({ onLogin, toggleToRegister }) {
   const [identifier, setIdentifier] = useState('');
@@ -9,9 +13,56 @@ function Login({ onLogin, toggleToRegister }) {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [isEmailLogin, setIsEmailLogin] = useState(true);
+  const [countryCode, setCountryCode] = useState('+95'); // Default to Myanmar
+  const [errors, setErrors] = useState({}); // For validation feedback
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const phoneRegex = /^\+?\d{10,15}$/;
+  const phoneRegex = /^\d{6,15}$/;
+
+  // Define the base API URL
+  const API_BASE_URL = process.env.NODE_ENV === 'production'
+    ? 'https://ladyfirstme.pythonanywhere.com/api/auth'
+    : 'http://localhost:8000/api/auth';
+
+  // Sort countries alphabetically by name
+  const sortedCountries = [...countries].sort((a, b) => a.name.localeCompare(b.name));
+
+  const handleIdentifierChange = (e) => {
+    const value = e.target.value;
+    if (!isEmailLogin) {
+      if (value && !/^\d*$/.test(value)) {
+        setErrors({ ...errors, identifier: 'Phone number must contain only digits.' });
+        setError('Phone number must contain only digits.');
+        return;
+      }
+      setIdentifier(`${countryCode}${value}`);
+      setErrors({ ...errors, identifier: '' });
+      setError('');
+    } else {
+      setIdentifier(value);
+      if (value && !emailRegex.test(value)) {
+        setErrors({ ...errors, identifier: 'Please enter a valid email address.' });
+      } else {
+        setErrors({ ...errors, identifier: '' });
+      }
+    }
+  };
+
+  const handleCountryCodeChange = (e) => {
+    const newCountryCode = e.target.value;
+    setCountryCode(newCountryCode);
+    const phoneNumber = identifier.replace(/^\+\d+/, '');
+    setIdentifier(`${newCountryCode}${phoneNumber}`);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    if (e.target.value.length < 6) {
+      setErrors({ ...errors, password: 'Password must be at least 6 characters.' });
+    } else {
+      setErrors({ ...errors, password: '' });
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -20,14 +71,23 @@ function Login({ onLogin, toggleToRegister }) {
 
     if (isEmailLogin) {
       if (!emailRegex.test(identifier)) {
+        setErrors({ ...errors, identifier: 'Please enter a valid email address.' });
         setError('Please enter a valid email address.');
         return;
       }
     } else {
-      if (!phoneRegex.test(identifier)) {
-        setError('Please enter a valid phone number (10-15 digits, optional +).');
+      const phoneNumber = identifier.replace(countryCode, '');
+      if (!phoneRegex.test(phoneNumber)) {
+        setErrors({ ...errors, identifier: 'Please enter a valid phone number (6-15 digits).' });
+        setError('Please enter a valid phone number (6-15 digits).');
         return;
       }
+    }
+
+    if (password.length < 6) {
+      setErrors({ ...errors, password: 'Password must be at least 6 characters.' });
+      setError('Password must be at least 6 characters.');
+      return;
     }
 
     try {
@@ -37,7 +97,7 @@ function Login({ onLogin, toggleToRegister }) {
 
       console.log('Login Payload:', payload);
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/login/`, {
+      const response = await fetch(`${API_BASE_URL}/login/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -55,16 +115,16 @@ function Login({ onLogin, toggleToRegister }) {
         fetchUserData(json.access);
         onLogin();
       } else {
-        setMessage(json.error || 'Login failed');
+        setError(json.error || 'Login failed');
       }
     } catch (error) {
-      setMessage('Error: ' + error.message);
+      setError('Error: ' + error.message);
     }
   };
 
   const fetchUserData = async (token) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/user/`, {
+      const response = await fetch(`${API_BASE_URL}/user/`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -76,48 +136,101 @@ function Login({ onLogin, toggleToRegister }) {
         const userData = await response.json();
         console.log('User data:', userData);
       } else {
-        setMessage('Failed to fetch user details');
+        setError('Failed to fetch user details');
       }
     } catch (error) {
-      setMessage('Error fetching user: ' + error.message);
+      setError('Error fetching user: ' + error.message);
     }
   };
 
   return (
     <div className="login-container">
       <form className="login-form" onSubmit={handleLogin}>
-        <h2>Login</h2>
+        <h2>Login to Your Account</h2>
         <div className="login-toggle">
-          <span
-            className={`login-option ${isEmailLogin ? 'active' : ''}`}
+          <button
+            type="button"
+            className={`toggle-btn ${isEmailLogin ? 'active' : ''}`}
             onClick={() => setIsEmailLogin(true)}
           >
             Email
-          </span>
-          <span
-            className={`login-option ${!isEmailLogin ? 'active' : ''}`}
+          </button>
+          <button
+            type="button"
+            className={`toggle-btn ${!isEmailLogin ? 'active' : ''}`}
             onClick={() => setIsEmailLogin(false)}
           >
             Phone Number
-          </span>
+          </button>
         </div>
-        <input
-          type="text"
-          placeholder={isEmailLogin ? 'Email' : 'Phone Number'}
-          value={identifier}
-          onChange={(e) => setIdentifier(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Login</button>
+
+        <div className="form-step">
+          {isEmailLogin ? (
+            <div className="input-group">
+              <label htmlFor="email">
+                <FaEnvelope className="input-icon" /> Email
+                <span className="helper-text"> (e.g., user@example.com)</span>
+              </label>
+              <input
+                type="text"
+                id="email"
+                placeholder="Enter your email"
+                value={identifier}
+                onChange={handleIdentifierChange}
+                required
+                className={errors.identifier ? 'input-error' : ''}
+              />
+            </div>
+          ) : (
+            <div className="input-group phone-input-group">
+              <label htmlFor="phone_number">
+                <FaPhone className="input-icon" /> Phone Number
+                <span className="helper-text"> (e.g., 123456789)</span>
+                <span className="tooltip">Must be 6-15 digits</span>
+              </label>
+              <div className="phone-input-wrapper">
+                <select value={countryCode} onChange={handleCountryCodeChange}>
+                  {sortedCountries.map((country) => (
+                    <option key={country.code} value={country.phone}>
+                      {country.phone} ({country.name})
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  id="phone_number"
+                  placeholder="Enter phone number"
+                  value={identifier.replace(countryCode, '')}
+                  onChange={handleIdentifierChange}
+                  required
+                  className={errors.identifier ? 'input-error' : ''}
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="input-group">
+            <label htmlFor="password">
+              <FaLock className="input-icon" /> Password
+              <span className="helper-text"> (minimum 6 characters)</span>
+            </label>
+            <input
+              type="password"
+              id="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={handlePasswordChange}
+              required
+              className={errors.password ? 'input-error' : ''}
+            />
+          </div>
+        </div>
+
+        <button type="submit" className="btn-primary">Login</button>
+
         {message && <p className="message">{message}</p>}
         {error && <p className="error">{error}</p>}
+
         <p className="toggle-text">
           Don't have an account?{' '}
           <span className="toggle-link" onClick={toggleToRegister}>

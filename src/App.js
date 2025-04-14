@@ -28,7 +28,7 @@ function AppContent() {
 
   const handleLogout = useCallback(async () => {
     try {
-      await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/logout/', {
+      await fetch('http://localhost:8000/api/auth/logout/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -53,7 +53,7 @@ function AppContent() {
       return;
     }
     try {
-      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/user/', {
+      const response = await fetch('http://localhost:8000/api/auth/user/', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -86,7 +86,7 @@ function AppContent() {
       return;
     }
     try {
-      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/token/refresh/', {
+      const response = await fetch('http://localhost:8000/api/auth/token/refresh/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh: refresh_token }),

@@ -7,7 +7,7 @@ function OrderHistory() {
 
   const handlePayment = async (orderId) => {
     const token = localStorage.getItem('access_token');
-    const response = await fetch(`https://ladyfirstme.pythonanywhere.com/api/auth/pay-order/${orderId}/`, {
+    const response = await fetch(`http://localhost:8000/api/auth/pay-order/${orderId}/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -31,7 +31,7 @@ function OrderHistory() {
   useEffect(() => {
     const fetchOrders = async () => {
       const token = localStorage.getItem('access_token');
-      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/myorders/', {
+      const response = await fetch('http://localhost:8000/api/auth/myorders/', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
