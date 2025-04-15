@@ -5,9 +5,15 @@ import { Link } from 'react-router-dom';
 function OrderHistory() {
   const [orders, setOrders] = useState([]);
 
+  const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? 'https://ladyfirstme.pythonanywhere.com/api/auth'
+  : 'http://localhost:8000/api/auth';
+
+  // `${API_BASE_URL}
+
   const handlePayment = async (orderId) => {
     const token = localStorage.getItem('access_token');
-    const response = await fetch(`http://localhost:8000/api/auth/pay-order/${orderId}/`, {
+    const response = await fetch(`${API_BASE_URL}/api/auth/pay-order/${orderId}/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -31,7 +37,7 @@ function OrderHistory() {
   useEffect(() => {
     const fetchOrders = async () => {
       const token = localStorage.getItem('access_token');
-      const response = await fetch('http://localhost:8000/api/auth/myorders/', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/myorders/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

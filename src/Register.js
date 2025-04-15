@@ -17,7 +17,13 @@ function Register({ onRegisterSuccess, toggleToLogin }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api/auth';
+  // const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api/auth';
+
+  const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? 'https://ladyfirstme.pythonanywhere.com/api/auth'
+  : 'http://localhost:8000/api/auth';
+
+  // `${API_BASE_URL}
 
   const sortedCountries = [...countries].sort((a, b) => a.name.localeCompare(b.name));
 

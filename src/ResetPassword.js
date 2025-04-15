@@ -11,6 +11,12 @@ function ResetPassword() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? 'https://ladyfirstme.pythonanywhere.com/api/auth'
+  : 'http://localhost:8000/api/auth';
+
+  // `${API_BASE_URL}
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
@@ -20,7 +26,7 @@ function ResetPassword() {
       return;
     }
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/reset-password/${token}/`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/reset-password/${token}/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ new_password: newPassword, confirm_password: confirmPassword }),

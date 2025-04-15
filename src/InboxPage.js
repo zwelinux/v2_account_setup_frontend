@@ -6,13 +6,17 @@ function InboxPage() {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const API_BASE_URL = process.env.NODE_ENV === 'production'
+    ? 'https://ladyfirstme.pythonanywhere.com/api/auth'
+    : 'http://localhost:8000/api/auth';
+
   useEffect(() => {
     const token = localStorage.getItem('access_token');
     if (!token) return;
 
     const fetchConversations = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/auth/messages/inbox/', {
+        const res = await fetch(`${API_BASE_URL}/api/auth/messages/inbox/`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

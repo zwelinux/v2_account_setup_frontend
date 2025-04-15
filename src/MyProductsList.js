@@ -14,6 +14,12 @@ function MyProductsList({ refresh }) {
     second_hand_price: "",
   });
 
+  const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? 'https://ladyfirstme.pythonanywhere.com/api/auth'
+  : 'http://localhost:8000/api/auth';
+
+  // `${API_BASE_URL}
+
   const getAccessToken = () => localStorage.getItem("access_token");
 
   const fetchMyProducts = useCallback(async () => {
@@ -24,7 +30,7 @@ function MyProductsList({ refresh }) {
     }
 
     try {
-      const response = await fetch("http://localhost:8000/api/auth/myproducts/", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/myproducts/`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -56,7 +62,7 @@ function MyProductsList({ refresh }) {
     }
 
     try {
-      const response = await fetch(`http://localhost:8000/api/auth/products/${id}/`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/products/${id}/`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -104,7 +110,7 @@ function MyProductsList({ refresh }) {
         second_hand_price: parseFloat(formData.second_hand_price) || 0,
       };
 
-      const response = await fetch(`http://localhost:8000/api/auth/products/${editProduct.id}/`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/products/${editProduct.id}/`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -140,7 +146,7 @@ function MyProductsList({ refresh }) {
             <div className="product-card" key={product.id}>
               <Link to={`/products/${product.id}`} className="product-link">
                 <img
-                  src={product.image.startsWith("http") ? product.image : `http://localhost:8000/media/${product.image}`}
+                  src={product.image.startsWith("http") ? product.image : `${API_BASE_URL}media/${product.image}`}
                   alt={product.title}
                 />
                 <div className="card-body">
