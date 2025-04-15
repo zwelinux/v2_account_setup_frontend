@@ -3,143 +3,81 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import countries from './countries';
 import './Login.css';
-
-// Import icons from react-icons
 import { FaPhone, FaEnvelope, FaLock } from 'react-icons/fa';
 
 function Login({ onLogin, toggleToRegister }) {
-  const [identifier, setIdentifier] = useState('');
+  const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [countryCode, setCountryCode] = useState('+95');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [isEmailLogin, setIsEmailLogin] = useState(true);
-  const [countryCode, setCountryCode] = useState('+95'); // Default to Myanmar
-  const [errors, setErrors] = useState({}); // For validation feedback
+  const [errors, setErrors] = useState({});
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const phoneRegex = /^\d{6,15}$/;
-
-  // Define the base API URL
   const API_BASE_URL = process.env.NODE_ENV === 'production'
     ? 'https://ladyfirstme.pythonanywhere.com/api/auth'
     : 'http://localhost:8000/api/auth';
 
-  // Sort countries alphabetically by name
   const sortedCountries = [...countries].sort((a, b) => a.name.localeCompare(b.name));
-
-  const handleIdentifierChange = (e) => {
-    const value = e.target.value;
-    if (!isEmailLogin) {
-      if (value && !/^\d*$/.test(value)) {
-        setErrors({ ...errors, identifier: 'Phone number must contain only digits.' });
-        setError('Phone number must contain only digits.');
-        return;
-      }
-      setIdentifier(`${countryCode}${value}`);
-      setErrors({ ...errors, identifier: '' });
-      setError('');
-    } else {
-      setIdentifier(value);
-      if (value && !emailRegex.test(value)) {
-        setErrors({ ...errors, identifier: 'Please enter a valid email address.' });
-      } else {
-        setErrors({ ...errors, identifier: '' });
-      }
-    }
-  };
-
-  const handleCountryCodeChange = (e) => {
-    const newCountryCode = e.target.value;
-    setCountryCode(newCountryCode);
-    const phoneNumber = identifier.replace(/^\+\d+/, '');
-    setIdentifier(`${newCountryCode}${phoneNumber}`);
-  };
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-    if (e.target.value.length < 6) {
-      setErrors({ ...errors, password: 'Password must be at least 6 characters.' });
-    } else {
-      setErrors({ ...errors, password: '' });
-    }
-  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setMessage('');
     setError('');
+    setErrors({});
 
-    if (isEmailLogin) {
-      if (!emailRegex.test(identifier)) {
-        setErrors({ ...errors, identifier: 'Please enter a valid email address.' });
-        setError('Please enter a valid email address.');
-        return;
-      }
-    } else {
-      const phoneNumber = identifier.replace(countryCode, '');
-      if (!phoneRegex.test(phoneNumber)) {
-        setErrors({ ...errors, identifier: 'Please enter a valid phone number (6-15 digits).' });
-        setError('Please enter a valid phone number (6-15 digits).');
-        return;
-      }
+    const identifier = isEmailLogin ? email : `${countryCode}${phoneNumber}`;
+    if (!identifier) {
+      setErrors({ identifier: 'Please enter your email or phone number.' });
+      setError('Please enter your email or phone number.');
+      return;
     }
 
-    if (password.length < 6) {
-      setErrors({ ...errors, password: 'Password must be at least 6 characters.' });
-      setError('Password must be at least 6 characters.');
+    if (isEmailLogin && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setErrors({ identifier: 'Please enter a valid email address.' });
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    if (!isEmailLogin && !/^\d{6,15}$/.test(phoneNumber)) {
+      setErrors({ identifier: 'Phone number must be 6-15 digits.' });
+      setError('Phone number must be 6-15 digits.');
+      return;
+    }
+
+    if (!password) {
+      setErrors({ password: 'Password is required.' });
+      setError('Password is required.');
       return;
     }
 
     try {
       const payload = isEmailLogin
-        ? { email: identifier, password }
-        : { phone_number: identifier, password };
-
-      console.log('Login Payload:', payload);
+        ? { email, password }
+        : { phone_number: `${countryCode}${phoneNumber}`, password };
 
       const response = await fetch(`${API_BASE_URL}/login/`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
       const json = await response.json();
-      console.log('Login Response:', json);
-
       if (response.ok) {
         localStorage.setItem('access_token', json.access);
         localStorage.setItem('refresh_token', json.refresh);
         setMessage('Logged in successfully!');
-        fetchUserData(json.access);
+        setEmail('');
+        setPhoneNumber('');
+        setPassword('');
+        setCountryCode('+95');
         onLogin();
       } else {
-        setError(json.error || 'Login failed');
+        setError(json.error || 'Invalid credentials. Please try again.');
       }
     } catch (error) {
-      setError('Error: ' + error.message);
-    }
-  };
-
-  const fetchUserData = async (token) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/user/`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-        console.log('User data:', userData);
-      } else {
-        setError('Failed to fetch user details');
-      }
-    } catch (error) {
-      setError('Error fetching user: ' + error.message);
+      setError('Error: Unable to connect to the server.');
     }
   };
 
@@ -172,14 +110,15 @@ function Login({ onLogin, toggleToRegister }) {
                 <span className="helper-text"> (e.g., user@example.com)</span>
               </label>
               <input
-                type="text"
+                type="email"
                 id="email"
                 placeholder="Enter your email"
-                value={identifier}
-                onChange={handleIdentifierChange}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 className={errors.identifier ? 'input-error' : ''}
               />
+              {errors.identifier && <p className="error-text">{errors.identifier}</p>}
             </div>
           ) : (
             <div className="input-group phone-input-group">
@@ -189,7 +128,7 @@ function Login({ onLogin, toggleToRegister }) {
                 <span className="tooltip">Must be 6-15 digits</span>
               </label>
               <div className="phone-input-wrapper">
-                <select value={countryCode} onChange={handleCountryCodeChange}>
+                <select value={countryCode} onChange={(e) => setCountryCode(e.target.value)}>
                   {sortedCountries.map((country) => (
                     <option key={country.code} value={country.phone}>
                       {country.phone} ({country.name})
@@ -200,36 +139,37 @@ function Login({ onLogin, toggleToRegister }) {
                   type="text"
                   id="phone_number"
                   placeholder="Enter phone number"
-                  value={identifier.replace(countryCode, '')}
-                  onChange={handleIdentifierChange}
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
                   required
                   className={errors.identifier ? 'input-error' : ''}
                 />
               </div>
+              {errors.identifier && <p className="error-text">{errors.identifier}</p>}
             </div>
           )}
 
           <div className="input-group">
             <label htmlFor="password">
               <FaLock className="input-icon" /> Password
-              <span className="helper-text"> (minimum 6 characters)</span>
             </label>
             <input
               type="password"
               id="password"
               placeholder="Enter your password"
               value={password}
-              onChange={handlePasswordChange}
+              onChange={(e) => setPassword(e.target.value)}
               required
               className={errors.password ? 'input-error' : ''}
             />
+            {errors.password && <p className="error-text">{errors.password}</p>}
           </div>
         </div>
 
         <button type="submit" className="btn-primary">Login</button>
 
         {message && <p className="message">{message}</p>}
-        {error && <p className="error">{error}</p>}
+        {error && <p className="error-text">{error}</p>}
 
         <p className="toggle-text">
           Don't have an account?{' '}

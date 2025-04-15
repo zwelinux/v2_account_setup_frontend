@@ -18,21 +18,45 @@ function ProductList() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/auth/categories/');
-      const data = await response.json();
-      setCategories(data);
+      const token = localStorage.getItem('access_token');
+      const response = await fetch('http://localhost:8000/api/auth/categories/', {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(Array.isArray(data) ? data : []);
+      } else {
+        console.error('Failed to load categories:', response.status, response.statusText);
+        setCategories([]);
+      }
     } catch (err) {
       console.error('Failed to load categories:', err);
+      setCategories([]);
     }
   };
-  
+
   const fetchBrands = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/auth/brands/');
-      const data = await response.json();
-      setBrands(data);
+      const token = localStorage.getItem('access_token');
+      const response = await fetch('http://localhost:8000/api/auth/brands/', {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setBrands(Array.isArray(data) ? data : []);
+      } else {
+        console.error('Failed to load brands:', response.status, response.statusText);
+        setBrands([]);
+      }
     } catch (err) {
       console.error('Failed to load brands:', err);
+      setBrands([]);
     }
   };
 
@@ -47,26 +71,36 @@ function ProductList() {
       ...(searchTerm && { keyword: searchTerm }),
       ...customFilters,
     });
-  
+
     try {
+      const token = localStorage.getItem('access_token');
       const response = await fetch(
-        `http://localhost:8000/api/auth/products/?${queryParams.toString()}`,
+        `http://localhost:8000/api/auth/products/?${queryParams.toString()}`, // Fixed endpoint
         {
           method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` }),
+          },
         }
       );
       if (response.ok) {
         const data = await response.json();
-        setProducts(data.products);
-        setCurrentPage(data.current_page);
-        setTotalPages(data.total_pages);
+        setProducts(Array.isArray(data.products) ? data.products : []);
+        setCurrentPage(data.current_page || 1);
+        setTotalPages(data.total_pages || 1);
+        setError('');
       } else {
-        setError('Failed to load products.');
+        setError(`Failed to load products: ${response.status} ${response.statusText}`);
+        setProducts([]);
+        setCurrentPage(1);
+        setTotalPages(1);
       }
     } catch (err) {
       setError('Error: ' + err.message);
+      setProducts([]);
+      setCurrentPage(1);
+      setTotalPages(1);
     }
   };
 
@@ -78,20 +112,20 @@ function ProductList() {
 
   // Construct a full URL for the image
   const getImageUrl = (product) => {
-    // If your serializer returns an absolute URL in `image_url`, use that
     if (product.image_url) return product.image_url;
-    // Otherwise, assume the image field is a relative path under /media/
     return `http://localhost:8000/media/${product.image}`;
   };
+
+  // Update filters to fetch products when they change
+  useEffect(() => {
+    fetchProducts(1);
+  }, [sortBy, priceRange, selectedCategory, selectedBrand]);
 
   return (
     <div className="product-list-container">
       <h2>All Products</h2>
 
-     
-
       <div className="filter-bar">
-
         <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
           <option value="">Sort By</option>
           <option value="a_z">A → Z</option>
@@ -110,7 +144,10 @@ function ProductList() {
           <option value="200_99999">$200+</option>
         </select>
 
-        <select value={selectedCategory} onChange={(e) => setSelectedCategory(Number(e.target.value))}>
+        <select
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(Number(e.target.value))}
+        >
           <option value="">All Categories</option>
           {categories.map((cat) => (
             <option key={cat.id} value={cat.id}>
@@ -119,7 +156,10 @@ function ProductList() {
           ))}
         </select>
 
-        <select value={selectedBrand} onChange={(e) => setSelectedBrand(Number(e.target.value))}>
+        <select
+          value={selectedBrand}
+          onChange={(e) => setSelectedBrand(Number(e.target.value))}
+        >
           <option value="">All Brands</option>
           {brands.map((brand) => (
             <option key={brand.id} value={brand.id}>
@@ -127,11 +167,13 @@ function ProductList() {
             </option>
           ))}
         </select>
-        
-        <button onClick={() => fetchProducts(1)} className='apply'>Apply</button>
+
+        <button onClick={() => fetchProducts(1)} className="apply">
+          Apply
+        </button>
         <button
           style={{ backgroundColor: '#ccc', marginLeft: '0rem' }}
-          className='reset'
+          className="reset"
           onClick={() => {
             setSortBy('');
             setPriceRange('');
@@ -159,27 +201,31 @@ function ProductList() {
             if (e.key === 'Enter') fetchProducts(1, { keyword: searchTerm });
           }}
         />
-        <button onClick={() => fetchProducts(1, { keyword: searchTerm })}>Search</button>
+        <button onClick={() => fetchProducts(1, { keyword: searchTerm })}>
+          Search
+        </button>
       </div>
-
 
       {error && <p className="error-message">{error}</p>}
       <div className="product-cards">
-      {products.length > 0 ? (
-        products.map((product) => (
-          <Link key={product.id} to={`/products/${product.id}`} className="product-link">
-            <div className="product-card">
-              <img src={product.image_url} alt={product.title} />
-              <div className="price">฿{product.second_hand_price}</div>
-              <h4>{product.title}</h4>
-              <p>{product.category_name} | {product.brand_name}</p>
-            </div>
-          </Link>
-        ))
-      ) : (
-        <p>No products found.</p>
-      )}
-
+        {products.length > 0 ? (
+          products.map((product) => (
+            <Link
+              key={product.id}
+              to={`/products/${product.id}`}
+              className="product-link"
+            >
+              <div className="product-card">
+                <img src={getImageUrl(product)} alt={product.title} />
+                <div className="price">฿{product.second_hand_price}</div>
+                <h4>{product.title}</h4>
+                <p>{product.category_name} | {product.brand_name}</p>
+              </div>
+            </Link>
+          ))
+        ) : (
+          <p>No products found.</p>
+        )}
       </div>
 
       <div className="pagination">

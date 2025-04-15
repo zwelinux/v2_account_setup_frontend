@@ -1,13 +1,16 @@
 /* src/Register.css */
+
+/* Container */
 .register-container {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   padding: 1.5rem;
 }
 
+/* Form */
 .register-form {
   background: #ffffff;
   padding: 2.5rem;
@@ -30,12 +33,14 @@
   font-weight: 600;
 }
 
+/* Form Step Layout */
 .form-step {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
 }
 
+/* Input Groups */
 .input-group {
   display: flex;
   flex-direction: column;
@@ -86,19 +91,19 @@
 
 .register-form input,
 .register-form select,
-.register-form textarea { /* Added textarea */
+.register-form textarea {
   padding: 0.9rem;
   font-size: 1rem;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   transition: all 0.3s ease;
   background: #f9f9f9;
-  resize: vertical; /* Allow vertical resizing for textarea */
+  resize: vertical;
 }
 
 .register-form input:focus,
 .register-form select:focus,
-.register-form textarea:focus { /* Added textarea */
+.register-form textarea:focus {
   outline: none;
   border-color: #3498db;
   box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
@@ -112,13 +117,13 @@
 }
 
 /* Phone Number Input */
-.phone-input-group .phone-input-wrapper {
+.phone-input-wrapper {
   display: flex;
   gap: 0.5rem;
 }
 
 .phone-input-wrapper select {
-  width: 120px;
+  flex: 0 0 30%;
   background: #fff;
   border: 1px solid #e0e0e0;
   border-radius: 8px 0 0 8px;
@@ -137,8 +142,6 @@
 
 .unit-input-wrapper select {
   width: 80px;
-  background: #fff;
-  border: 1px solid #e0e0e0;
   border-radius: 8px 0 0 8px;
 }
 
@@ -157,7 +160,7 @@
   flex: 1;
 }
 
-/* Input Error */
+/* Error Handling */
 .input-error {
   border-color: #e74c3c !important;
 }
@@ -166,14 +169,13 @@
   box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1) !important;
 }
 
-/* Error Text */
 .error-text {
   font-size: 0.85rem;
   color: #e74c3c;
   margin-top: 0.2rem;
 }
 
-/* Buttons */
+/* Button Group */
 .button-group {
   display: flex;
   justify-content: space-between;
@@ -181,6 +183,7 @@
   margin-top: 2rem;
 }
 
+/* Buttons */
 .btn-primary {
   flex: 1;
   padding: 0.9rem;
@@ -217,7 +220,7 @@
   transform: translateY(-2px);
 }
 
-/* Message */
+/* Message Display */
 .message {
   margin-top: 1.5rem;
   text-align: center;
@@ -228,26 +231,7 @@
   color: #2c3e50;
 }
 
-/* Toggle Text */
-.toggle-text {
-  text-align: center;
-  margin-top: 1.5rem;
-  font-size: 0.9rem;
-  color: #7f8c8d;
-}
-
-.toggle-link {
-  color: #3498db;
-  cursor: pointer;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.toggle-link:hover {
-  text-decoration: underline;
-}
-
-/* Already present in Register.css, but ensure these match Login.css */
+/* Toggle Between Email/Phone */
 .login-toggle {
   display: flex;
   justify-content: center;
@@ -255,6 +239,7 @@
   background: #ecf0f1;
   border-radius: 25px;
   padding: 0.3rem;
+  gap: 0.5rem;
 }
 
 .toggle-btn {
@@ -277,4 +262,23 @@
 
 .toggle-btn:hover:not(.active) {
   background: #dfe6e9;
+}
+
+/* Toggle Text for Login Link */
+.toggle-text {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: #7f8c8d;
+}
+
+.toggle-link {
+  color: #3498db;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.toggle-link:hover {
+  text-decoration: underline;
 }
