@@ -10,11 +10,17 @@ function UserProfile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? 'https://ladyfirstme.pythonanywhere.com/api/auth'
+  : 'http://localhost:8000/api/auth';
+
+  // `${API_BASE_URL}
+
   // Fetch public profile data
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/auth/profile/${username}/`, {
+        const response = await fetch(`${API_BASE_URL}/api/auth/profile/${username}/`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           // Removed credentials: 'include' to allow public access
@@ -40,7 +46,7 @@ function UserProfile() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/auth/profile/${username}/products/`, {
+        const response = await fetch(`${API_BASE_URL}/api/auth/profile/${username}/products/`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           // Removed credentials: 'include' to allow public access
@@ -75,8 +81,8 @@ function UserProfile() {
           src={profile.profile_picture 
             ? (profile.profile_picture.startsWith('http') 
               ? profile.profile_picture 
-              : `http://localhost:8000/media/${profile.profile_picture}`)
-            : 'http://localhost:8000/media/default_profile.jpg'}
+              : `${API_BASE_URL}/media/${profile.profile_picture}`)
+            : `${API_BASE_URL}/media/default_profile.jpg`}
           alt={`${profile.username}'s profile`}
         />
 
@@ -97,7 +103,7 @@ function UserProfile() {
               <Link to={`/products/${product.id}`} className="product-link">
                 <img
                   className="product-image"
-                  src={product.image_url ? product.image_url : `http://localhost:8000/media/${product.image}`}
+                  src={product.image_url ? product.image_url : `${API_BASE_URL}/media/${product.image}`}
                   alt={product.title}
                 />
                 <h4>{product.title}</h4>

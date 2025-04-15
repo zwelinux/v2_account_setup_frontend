@@ -16,10 +16,16 @@ function ProductList() {
   const [brands, setBrands] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
+  const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? 'https://ladyfirstme.pythonanywhere.com/api/auth'
+  : 'http://localhost:8000/api/auth';
+
+  // `${API_BASE_URL}
+
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const response = await fetch('http://localhost:8000/api/auth/categories/', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/categories/`, {
         headers: {
           'Content-Type': 'application/json',
           ...(token && { 'Authorization': `Bearer ${token}` }),
@@ -41,7 +47,7 @@ function ProductList() {
   const fetchBrands = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const response = await fetch('http://localhost:8000/api/auth/brands/', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/brands/`, {
         headers: {
           'Content-Type': 'application/json',
           ...(token && { 'Authorization': `Bearer ${token}` }),
@@ -75,7 +81,7 @@ function ProductList() {
     try {
       const token = localStorage.getItem('access_token');
       const response = await fetch(
-        `http://localhost:8000/api/auth/products/?${queryParams.toString()}`, // Fixed endpoint
+        `${API_BASE_URL}/api/auth/products/?${queryParams.toString()}`, // Fixed endpoint
         {
           method: 'GET',
           headers: {
@@ -113,7 +119,7 @@ function ProductList() {
   // Construct a full URL for the image
   const getImageUrl = (product) => {
     if (product.image_url) return product.image_url;
-    return `http://localhost:8000/media/${product.image}`;
+    return `${API_BASE_URL}/media/${product.image}`;
   };
 
   // Update filters to fetch products when they change

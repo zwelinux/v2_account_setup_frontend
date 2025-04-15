@@ -21,17 +21,23 @@ function ProductUpload({ onUploadSuccess }) {
   const [brands, setBrands] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
 
+  const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? 'https://ladyfirstme.pythonanywhere.com/api/auth'
+  : 'http://localhost:8000/api/auth';
+
+  // `${API_BASE_URL}
+
   useEffect(() => {
     async function fetchData() {
       try {
-        const catRes = await fetch('http://localhost:8000/api/auth/categories/');
+        const catRes = await fetch(`${API_BASE_URL}/api/auth/categories/`);
         const catData = await catRes.json();
         setCategories(catData);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
       try {
-        const brandRes = await fetch('http://localhost:8000/api/auth/brands/');
+        const brandRes = await fetch(`${API_BASE_URL}/api/auth/brands/`);
         const brandData = await brandRes.json();
         setBrands(brandData);
       } catch (error) {
@@ -80,7 +86,7 @@ function ProductUpload({ onUploadSuccess }) {
     }
 
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://localhost:8000/api/auth/products/");
+    xhr.open("POST", `${API_BASE_URL}/api/auth/products/`);
     xhr.setRequestHeader("Authorization", `Bearer ${token}`);
 
     xhr.upload.onprogress = (event) => {

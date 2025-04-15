@@ -21,6 +21,10 @@ function Checkout() {
   const [confirmed, setConfirmed] = useState(false);
   const navigate = useNavigate();
 
+  const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? 'https://ladyfirstme.pythonanywhere.com/api/auth'
+  : 'http://localhost:8000/api/auth';
+
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem('cart')) || [];
     setCartItems(savedCart);
@@ -30,7 +34,7 @@ function Checkout() {
       if (!token) return;
 
       try {
-        const response = await fetch("http://localhost:8000/api/auth/user/", {
+        const response = await fetch(`${API_BASE_URL}/api/auth/user/`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -62,7 +66,7 @@ function Checkout() {
     if (!token) return;
 
     try {
-      const response = await fetch("http://localhost:8000/api/auth/user/", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/user/`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -98,7 +102,7 @@ function Checkout() {
 
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:8000/api/auth/place-order/", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/place-order/`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

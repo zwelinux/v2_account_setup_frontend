@@ -7,10 +7,16 @@ function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [error, setError] = useState('');
 
+  const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? 'https://ladyfirstme.pythonanywhere.com/api/auth'
+  : 'http://localhost:8000/api/auth';
+
+  // `${API_BASE_URL}
+
   useEffect(() => {
     async function fetchProduct() {
       try {
-        const response = await fetch(`http://localhost:8000/api/auth/products/${id}/`);
+        const response = await fetch(`${API_BASE_URL}/api/auth/products/${id}/`);
         const data = await response.json();
         if (response.ok) {
           setProduct(data);
@@ -39,7 +45,7 @@ function ProductDetail() {
       id: product.id,
       title: product.title,
       price: product.second_hand_price,
-      image: product.image_url || `http://localhost:8000/media/${product.image}`,
+      image: product.image_url || `${API_BASE_URL}/media/${product.image}`,
       quantity: 1,
     };
 
@@ -59,7 +65,7 @@ function ProductDetail() {
       <div className="product-detail-wrapper">
         <div className="product-detail-left">
           <img
-            src={product.image_url || `http://localhost:8000/media/${product.image}`}
+            src={product.image_url || `${API_BASE_URL}/media/${product.image}`}
             alt={product.title}
           />
         </div>

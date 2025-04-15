@@ -7,11 +7,15 @@ function LandingProductShowcase() {
   const [products, setProducts] = useState([]);
   const rowRef = useRef(null);
 
+  const API_BASE_URL = process.env.NODE_ENV === 'production'
+    ? 'https://ladyfirstme.pythonanywhere.com/api/auth'
+    : 'http://localhost:8000/api/auth';
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(
-          'http://localhost:8000/api/auth/products/?sort_by=low_to_high&limit=10'
+          `${API_BASE_URL}/api/auth/products/?sort_by=low_to_high&limit=10`
         );
         const data = await response.json();
 
