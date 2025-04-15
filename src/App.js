@@ -1,8 +1,8 @@
-// src/App.js
 import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Register from './Register';
 import Login from './Login';
+import AccountSetup from './AccountSetup';
 import Dashboard from './Dashboard';
 import Profile from './Profile';
 import UploadProduct from './UploadProduct';
@@ -15,8 +15,8 @@ import Checkout from './Checkout';
 import OrderHistory from './OrderHistory';
 import SellerDashboard from './SellerDashboard';
 import InboxPage from './InboxPage';
-import ForgotPassword from './ForgotPassword';  // New component
-import ResetPassword from './ResetPassword';    // New component
+import ForgotPassword from './ForgotPassword';
+import ResetPassword from './ResetPassword';
 import './App.css';
 
 function AppContent() {
@@ -26,13 +26,89 @@ function AppContent() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const handleLogout = useCallback(async () => {
+  const API_BASE_URL = process.env.NODE_ENV === 'production'
+    ? 'https://ladyfirstme.pythonanywhere.com/api/auth'
+    : 'http://localhost:8000/api/auth';
+
+  const refreshToken = useCallback(async () => {
+    const refresh_token = localStorage.getItem('refresh_token');
+    if (!refresh_token) {
+      setIsAuthenticated(false);
+      setUser(null);
+      setLoading(false);
+      return false;
+    }
     try {
-      await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/logout/', {
+      const response = await fetch(`${API_BASE_URL}/token/refresh/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        body: JSON.stringify({ refresh: refresh_token }),
       });
+      if (response.ok) {
+        const json = await response.json();
+        localStorage.setItem('access_token', json.access);
+        return true;
+      } else {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        setUser(null);
+        setIsAuthenticated(false);
+        navigate('/');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error refreshing token:', error);
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      setUser(null);
+      setIsAuthenticated(false);
+      navigate('/');
+      return false;
+    }
+  }, [navigate]);
+
+  const handleLogout = useCallback(async () => {
+    try {
+      let accessToken = localStorage.getItem('access_token');
+      const refreshTokenValue = localStorage.getItem('refresh_token');
+
+      if (!refreshTokenValue) {
+        console.warn('No refresh token found, proceeding with client-side cleanup');
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        setUser(null);
+        setIsAuthenticated(false);
+        navigate('/');
+        return;
+      }
+
+      if (!accessToken) {
+        const refreshed = await refreshToken();
+        if (!refreshed) {
+          console.warn('Failed to refresh token, proceeding with cleanup');
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+          setUser(null);
+          setIsAuthenticated(false);
+          navigate('/');
+          return;
+        }
+        accessToken = localStorage.getItem('access_token');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/logout/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ refresh: refreshTokenValue }),
+      });
+
+      if (!response.ok) {
+        console.error('Logout failed:', response.status, await response.text());
+      }
+
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       setUser(null);
@@ -40,8 +116,13 @@ function AppContent() {
       navigate('/');
     } catch (error) {
       console.error('Logout error:', error);
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      setUser(null);
+      setIsAuthenticated(false);
+      navigate('/');
     }
-  }, [navigate]);
+  }, [navigate, refreshToken]);
 
   const checkUser = useCallback(async () => {
     setLoading(true);
@@ -53,7 +134,7 @@ function AppContent() {
       return;
     }
     try {
-      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/user/', {
+      const response = await fetch(`${API_BASE_URL}/user/`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -62,10 +143,19 @@ function AppContent() {
       });
       if (response.ok) {
         const data = await response.json();
-        setUser(data);
+        setUser({
+          id: data.id,
+          username: data.username,
+          email: data.email,
+          phone_number: data.phone_number,
+          is_setup_complete: data.is_setup_complete,
+        });
         setIsAuthenticated(true);
       } else if (response.status === 401) {
-        await refreshToken();
+        const refreshed = await refreshToken();
+        if (refreshed) {
+          await checkUser();
+        }
       } else {
         setUser(null);
         setIsAuthenticated(false);
@@ -77,38 +167,17 @@ function AppContent() {
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  const refreshToken = useCallback(async () => {
-    const refresh_token = localStorage.getItem('refresh_token');
-    if (!refresh_token) {
-      setIsAuthenticated(false);
-      return;
-    }
-    try {
-      const response = await fetch('https://ladyfirstme.pythonanywhere.com/api/auth/token/refresh/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refresh: refresh_token }),
-      });
-      if (response.ok) {
-        const json = await response.json();
-        localStorage.setItem('access_token', json.access);
-        checkUser();
-      } else {
-        handleLogout();
-      }
-    } catch (error) {
-      console.error('Error refreshing token:', error);
-      handleLogout();
-    }
-  }, [handleLogout]);
+  }, [refreshToken]);
 
   useEffect(() => {
     checkUser();
   }, [checkUser]);
 
   const handleLoginSuccess = () => {
+    checkUser();
+  };
+
+  const handleSetupComplete = () => {
     checkUser();
   };
 
@@ -126,20 +195,30 @@ function AppContent() {
         <Routes>
           <Route path="/profile/:username" element={<UserProfile />} />
           <Route path="/products/:id" element={<ProductDetail />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />  {/* New */}
-          <Route path="/reset-password/:token" element={<ResetPassword />} />  {/* New */}
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           {isAuthenticated ? (
-            <>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/upload" element={<UploadProduct />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/orders" element={<OrderHistory />} />
-              <Route path="/seller/dashboard" element={<SellerDashboard />} />
-              <Route path="/inbox" element={<InboxPage />} />
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
-            </>
+            user.is_setup_complete ? (
+              <>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/upload" element={<UploadProduct />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/orders" element={<OrderHistory />} />
+                <Route path="/seller/dashboard" element={<SellerDashboard />} />
+                <Route path="/inbox" element={<InboxPage />} />
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              </>
+            ) : (
+              <>
+                <Route
+                  path="/account-setup"
+                  element={<AccountSetup onSetupComplete={handleSetupComplete} user={user} />}
+                />
+                <Route path="*" element={<Navigate to="/account-setup" replace />} />
+              </>
+            )
           ) : (
             <>
               <Route
