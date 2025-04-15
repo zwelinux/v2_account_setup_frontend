@@ -17,8 +17,8 @@ function ProductList() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const API_BASE_URL = process.env.NODE_ENV === 'production'
-  ? 'https://ladyfirstme.pythonanywhere.com/api/auth'
-  : 'http://localhost:8000/api/auth';
+  ? 'https://ladyfirstme.pythonanywhere.com'
+  : 'http://localhost:8000';
 
   // `${API_BASE_URL}
 

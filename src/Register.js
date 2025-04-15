@@ -17,13 +17,9 @@ function Register({ onRegisterSuccess, toggleToLogin }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  // const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api/auth';
-
   const API_BASE_URL = process.env.NODE_ENV === 'production'
-  ? 'https://ladyfirstme.pythonanywhere.com/api/auth'
-  : 'http://localhost:8000/api/auth';
-
-  // `${API_BASE_URL}
+    ? 'https://ladyfirstme.pythonanywhere.com/api/auth'
+    : 'http://localhost:8000/api/auth';
 
   const sortedCountries = [...countries].sort((a, b) => a.name.localeCompare(b.name));
 
@@ -35,6 +31,36 @@ function Register({ onRegisterSuccess, toggleToLogin }) {
     } else {
       setEmail('');
       setErrors({ identifier: '' });
+    }
+    setMessage(''); // Clear any previous messages
+  };
+
+  // New function to check if the account exists
+  const handleCheckAccount = async (identifier) => {
+    const payload = isEmailMode ? { email: identifier } : { phone_number: identifier };
+    console.log('Checking account payload:', payload);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/check-account/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const json = await response.json();
+          throw new Error(json.error || 'Failed to check account.');
+        } else {
+          throw new Error('Server returned an unexpected response.');
+        }
+      }
+
+      const json = await response.json();
+      return json; // { exists: true/false, method: 'email'/'phone_number'/null }
+    } catch (error) {
+      throw new Error(error.message || 'Unable to connect to the server.');
     }
   };
 
@@ -66,8 +92,27 @@ function Register({ onRegisterSuccess, toggleToLogin }) {
       return;
     }
 
-    const payload = isEmailMode ? { email } : { phone_number: `${countryCode}${phoneNumber}` };
+    // Step 1: Check if the account already exists
+    try {
+      const accountCheck = await handleCheckAccount(identifier);
+      if (accountCheck.exists) {
+        setErrors({ identifier: `An account already exists with this ${accountCheck.method}.` });
+        setMessage(
+          `An account already exists with this ${accountCheck.method}. Please log in instead.`
+        );
+        setIsLoading(false);
+        return;
+      }
+    } catch (error) {
+      setMessage(`Error: ${error.message}`);
+      setIsLoading(false);
+      return;
+    }
+
+    // Step 2: If account doesn't exist, proceed to send OTP
+    const payload = isEmailMode ? { email } : { phone_number: identifier };
     console.log('Sending OTP payload:', payload);
+
     try {
       const response = await fetch(`${API_BASE_URL}/send-otp/`, {
         method: 'POST',
@@ -183,8 +228,14 @@ function Register({ onRegisterSuccess, toggleToLogin }) {
       }
 
       const json = await response.json();
-      localStorage.setItem('access_token', json.access);
-      localStorage.setItem('refresh_token', json.refresh);
+      try {
+        localStorage.setItem('access_token', json.access);
+        localStorage.setItem('refresh_token', json.refresh);
+      } catch (error) {
+        setMessage('Error: Unable to store tokens. Please check your browser settings.');
+        setIsLoading(false);
+        return;
+      }
       setMessage('Account created successfully!');
       setEmail('');
       setPhoneNumber('');
@@ -282,7 +333,7 @@ function Register({ onRegisterSuccess, toggleToLogin }) {
               </div>
             )}
             <button type="submit" className="btn-primary" disabled={isLoading}>
-              {isLoading ? 'Sending...' : 'Send OTP'}
+              {isLoading ? 'Checking...' : 'Send OTP'}
             </button>
           </div>
         )}
@@ -369,7 +420,7 @@ function Register({ onRegisterSuccess, toggleToLogin }) {
           </div>
         )}
 
-        {message && <p className={message.includes('Error') ? 'error-text' : 'message'}>{message}</p>}
+        {message && <p className={message.includes('Error') || message.includes('already exists') ? 'error-text' : 'message'}>{message}</p>}
 
         {step === 1 && (
           <p className="toggle-text">
